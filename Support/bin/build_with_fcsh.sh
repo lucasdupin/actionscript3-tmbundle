@@ -4,22 +4,6 @@
 
 OS=$(defaults read /System/Library/CoreServices/SystemVersion ProductVersion)
 
-function checkForSpaces {
-	if [[ "$1" != "$2" ]]; then
-		echo "Warning fsch cannot handle paths containing a space."
-		echo " "
-		echo "/path_to/app.mxml works"
-		echo "/path to/app.mxml fails as there is a space between path and to"
-		echo " "
-		echo "The path that caused the problem was"
-		echo " "
-		echo "$1"
-		echo " "
-		echo "See bundle help for more information."		
-		exit 206;
-	fi	
-}
-
 #search for the flex install directory.
 set_flex_path -t
 
@@ -43,22 +27,20 @@ if [ "$TM_FLEX_OUTPUT" == "" ]; then
 	exit 206;
 fi
 
-#TM_PROJECT_DIR=`dirname "$TM_PROJECT_FILEPATH"`;
 
 FCSH=$(echo "$TM_FLEX_PATH/bin/fcsh" | sed 's/ /\\ /g');
 MXMLC_O=$(echo "$TM_PROJECT_DIR/$TM_FLEX_OUTPUT" | sed 's/ /\\ /g');
 MXMLC_FS=$(echo "$TM_PROJECT_DIR/$TM_FLEX_FILE_SPECS" | sed 's/ /\\ /g');
-MXMLC_SP=$(echo "$TM_AS3_LIB_PATH" | sed 's/ /\\ /g');
+MXMLC_ARGS="mxmlc $MXMLC_FS -o=$MXMLC_O"
 
-checkForSpaces "$TM_PROJECT_DIR/$TM_FLEX_OUTPUT" "$MXMLC_O"
-checkForSpaces "$TM_PROJECT_DIR/$TM_FLEX_FILE_SPECS" "$MXMLC_FS"
-checkForSpaces "$TM_AS3_LIB_PATH" "$MXMLC_SP"
-
-MXMLC_ARGS="mxmlc -o=$MXMLC_O -file-specs=$MXMLC_FS"
-
-if [ "$TM_AS3_LIB_PATH" != "" ]; then
-	MXMLC_ARGS="$MXMLC_ARGS -sp+=$TM_AS3_LIB_PATH"
+if [ "$TM_FLEX_SOURCE" != "" ]; then
+	for s in $(echo $TM_FLEX_SOURCE | sed 's/:/ /g'); do MXMLC_ARGS="$MXMLC_ARGS -sp+=$TM_PROJECT_DIR/$s"; done
 fi
+
+if [ "$TM_FLEX_SWC" != "" ]; then
+	for s in $(echo $TM_FLEX_SWC | sed 's/:/ /g'); do MXMLC_ARGS="$MXMLC_ARGS -library-path+=$TM_PROJECT_DIR/$s"; done
+fi
+
 	
 "$TM_BUNDLE_SUPPORT/lib/fcsh_terminal" "$FCSH" "$MXMLC_ARGS" >/dev/null; 
 

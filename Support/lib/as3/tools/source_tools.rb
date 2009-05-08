@@ -11,9 +11,7 @@ module SourceTools
 	# See 'Settings' bundle preference to override defaults.
 	#
 	def self.common_src_dir_list
-		src_dirs = ENV['TM_AS3_USUAL_SRC_DIRS']
-		src_dirs = "src:lib:source:test" if src_dirs == nil
-		src_dirs
+		src_dirs = ENV['TM_FLEX_SOURCE']
 	end
 
 	# Returns an array of directory names that are commonly used
@@ -21,6 +19,10 @@ module SourceTools
 	#
 	def self.common_src_dirs
 		src_dirs_matches = common_src_dir_list.split(":")
+		src_dirs_matches.each do |path|
+		  path = ENV['TM_PROJECT_DIRECTORY'] + "/" + path
+		end
+		
 		src_dirs_matches
 	end
 
