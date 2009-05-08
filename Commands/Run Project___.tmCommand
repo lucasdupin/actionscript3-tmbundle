@@ -13,17 +13,8 @@ TM_FLEX_RUN_FILE=${TM_FLEX_RUN_FILE:=build/launch.sh}
 
 # Look for a custom 'run' script.
 if [[ (-f "$TM_PROJECT_DIR/$TM_FLEX_RUN_FILE") ]]; then
-	"$TM_PROJECT_DIR/$TM_FLEX_RUN_FILE";
+	open "$TM_PROJECT_DIR/$TM_FLEX_RUN_FILE";
 	exit $?
-else
-	open "deploy/index.html";
-	
-	#Or you could use...
-	#open -a Safari "deploy/index.html";
-	#open -a Firefox "deploy/index.html";
-	#open "$TM_FLEX_OUTPUT"
-	#open -a SAFlashPlayerDbgRel_en "$TM_FLEX_OUTPUT"
-	#open -a SAFlashPlayer "$TM_FLEX_OUTPUT"
 fi
 
 exit 0;
