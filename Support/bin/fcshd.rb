@@ -11,7 +11,8 @@ require SUPPORT + '/lib/escape'
 require SUPPORT + '/lib/web_preview'
 
 $server = XMLRPC::Client.new2("http://localhost:2345")
-#@logger = Logger.new('/tmp/fcshd/gui.log')
+@logger = Logger.new('/tmp/fcshd/gui.log')
+@logger.level = Logger::WARN
 
 
 def self.server_status
@@ -73,8 +74,10 @@ end
 
 def self.success
     print "<script type='text/javascript' charset='utf-8'>
-       document.getElementById('status').className='success'
-       document.getElementById('status').innerHTML='Success'
+      if( document.getElementById('status').className ! ='fail'){
+        document.getElementById('status').className='success'
+        document.getElementById('status').innerHTML='Success'
+      }
     </script>"  
 end
 

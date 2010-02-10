@@ -1,6 +1,9 @@
 #!/usr/bin/env ruby -wKU
 # encoding: utf-8
 
+SUPPORT = "#{ENV['TM_SUPPORT_PATH']}"
+require SUPPORT + '/lib/escape'
+
 # Parses output from the mxmlc compiler and html formats it for use with the
 # TextMate HTML output window.
 #
