@@ -20,9 +20,9 @@ FlexMate.complete_import(STDIN.read.strip)
 	<key>keyEquivalent</key>
 	<string>~</string>
 	<key>name</key>
-	<string>Complete Import</string>
+	<string>Auto Complete Import</string>
 	<key>output</key>
-	<string>discard</string>
+	<string>replaceSelectedText</string>
 	<key>scope</key>
 	<string>source.actionscript.3 meta.package.actionscript.3, source.actionscript.3.embedded.mxml, comment.block.documentation.asdoc</string>
 	<key>uuid</key>

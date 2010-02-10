@@ -1,6 +1,10 @@
 #!/usr/bin/env ruby -wKU
 # encoding: utf-8
 
+require "#{ENV['TM_BUNDLE_SUPPORT']}/bin/as3project"
+require 'digest/md5'
+require 'rexml/document'
+
 # ActionScript 3 utility methods for inspecting source directories, paths and
 # packages.
 #
@@ -39,13 +43,13 @@ module SourceTools
     # term. When used outside a project this step is skipped.
     TextMate.each_text_file do |file|
 
-      if file =~ /\b#{word}\w*\.(as|mxml)$/
+      if file =~ /\b#{word}\w*\.(as|mxml)$/i
 
         path = file.sub( project, "")
         path = truncate_to_src(path)
         path = path.gsub(/\.(as|mxml)$/,'').gsub( "/", ".").sub(/^\./,'')
 
-        if path =~ /\.#{word}$/
+        if path =~ /\.#{word}$/i
           best_paths << path
         else
           package_paths << path
@@ -73,7 +77,7 @@ module SourceTools
     toc = ::IO.readlines(help_toc)
     toc.each do |line|
 
-      if line =~ /href='([a-zA-Z0-9\/]*\b#{word}\w*)\.html'|([a-zA-Z0-9\/]*\/package\.html##{word}\w*)\(\)'/
+      if line =~ /href='([a-zA-Z0-9\/]*\b#{word}\w*)\.html'|([a-zA-Z0-9\/]*\/package\.html##{word}\w*)\(\)'/i
 
         if $2
           path = $2.gsub('package.html#', '').gsub('/', '.')
@@ -81,7 +85,7 @@ module SourceTools
             path = $1.gsub('/', '.')
         end
 
-        if path =~ /(^|\.)#{word}$/
+        if path =~ /(^|\.)#{word}$/i
           best_paths << path
         else
           package_paths << path
@@ -93,6 +97,29 @@ module SourceTools
     { :exact_matches => best_paths, :partial_matches => package_paths }
 
   end
+  
+  def self.search_library_paths(word)
+	  #Unpack the swcs
+		unpack_swcs
+		
+		#Result arrays
+		best_paths = []
+		package_paths = []
+		
+		# for each library entry
+		swc_definitions.each do |definition|
+		  #See if it matches
+      path = definition.sub(":",".")
+      if path =~ /\.#{word}$/i
+				best_paths << path
+			elsif path =~ /\.#{word}.*$/i
+			  package_paths << path
+			end
+		end
+		
+		{ :exact_matches => best_paths, :partial_matches => package_paths }
+	end
+	
 
   # Loads both bundle and project paths.
   #
@@ -100,9 +127,10 @@ module SourceTools
 
     pp = search_project_paths(word)
     bp = search_bundle_paths(word)
-
-    e = pp[:exact_matches] + bp[:exact_matches]
-    p = pp[:partial_matches] + bp[:partial_matches]
+		lp = search_library_paths(word)
+		
+		e = pp[:exact_matches] + bp[:exact_matches] + lp[:exact_matches]
+		p = pp[:partial_matches] + bp[:partial_matches] + lp[:partial_matches]
 
     e.uniq!
     p.uniq!
@@ -188,5 +216,134 @@ module SourceTools
     classes
     
   end
+  
+  # Unpack all swc in the library path
+  # searching for possible classes
+	def self.unpack_swcs
+	  
+	  project = "#{ENV['TM_PROJECT_DIRECTORY']}"
+	  
+	  #Loop through library, searching for SWC paths
+	  AS3Project.libray_path_list.each do |p|
+	    
+	    #Where to unpack
+	    lib_path = File.join(tmp_swc_dir, p.sub("/","_"))
+	    
+	    #Create a directory in the temp folder for holding the unpacked files
+	    Dir.mkdir lib_path unless File.directory? lib_path
+	    
+	    #Unpack files in this folder
+	    Dir.entries(File.join(project, p)).each do |entry|
+	      #is it an swc?
+	      if File.extname(entry) == ".swc"
+	        
+	        #Full path to file
+	        swc_path = File.join(project, p, entry)
+	        extraction_path = File.join lib_path, entry.sub(".swc","")
+	        
+	        #Checking if file changed
+	        stamp = File.stat(swc_path).mtime.to_i.to_s
+	        
+	        #checking if the file need to be extracted
+	        if !File.exists? File.join(extraction_path, stamp)
+	          #removing old entries
+	          `rm -rf #{extraction_path}`
+	          #swc found, time to unzip it
+            `unzip #{swc_path} -d #{extraction_path}`
+  	        #create md5
+  	        `touch #{File.join(extraction_path, stamp)}`
+	        end
+
+	      end
+	    end
+	    
+	  end
+	end
+	
+	#SWC working folder
+	@dir = nil
+	def self.tmp_swc_dir
+	  return @dir unless @dir.nil?
+	  
+	  #Create unique dir per project
+	  @dir = "/tmp/fcshd/swcs" + Digest::MD5.hexdigest("#{ENV['TM_PROJECT_DIRECTORY']}")
+	  
+	  #Check if temp dir exists, then create
+	  Dir.mkdir "/tmp/fcshd" unless File.directory? "/tmp/fcshd"
+	  Dir.mkdir @dir unless File.directory? @dir
+  	 
+  	@dir 
+	end
+	
+	
+	
+	# Generates a class structure for a given linkage
+  # Used for SWC auto completion
+  # 
+  # Returns a string ex:
+  # class MySwcClass extends Sprite
+  #   {
+  #     public function MySwcClass()
+  #     {
+  #       super();
+  #     }
+  #   }
+  def self.skeleton_for_swc_class(linkage)
+    #Getting a Swf object
+    swf = swf_for_linkage linkage
+    
+    class_path = "#{ENV['TM_FLEX_PATH'].gsub(' ', '\\ ')}/lib/swfutils.jar:#{ENV["TM_BUNDLE_SUPPORT"].gsub(' ', '\\ ')}/bin/swf_parser"
+    cmd = `java -cp #{class_path} Main #{swf} #{linkage.gsub('/','.')}`
+    bones
+	end
+	
+	def self.swc_definitions
+	  cat = []
+	  
+	  # for each library entry
+		Dir.entries(tmp_swc_dir).each do |entry|
+		  if File.directory?(File.join(tmp_swc_dir, entry)) && entry != "." && entry != ".."
+		    
+		    #Get all definitions
+    	  Dir.entries(File.join(tmp_swc_dir, entry)).each do |lib_path|
+    	    if lib_path != "." && lib_path != ".."
+    	      
+    	      #Open XML Catalog
+            catalog = REXML::Document.new( File.read(File.join(tmp_swc_dir, entry, lib_path, "catalog.xml")))
+            catalog.elements.each("*/libraries/library/script/def") do |definition|
+              
+              cat << definition.attributes["id"]
+              
+            end
+    	    end
+    	  end
+    	end
+		end
+		
+		cat
+	end
+	
+	def self.swf_for_linkage(linkage)
+	  # for each library entry
+		Dir.entries(tmp_swc_dir).each do |entry|
+		  if File.directory?(File.join(tmp_swc_dir, entry)) && entry != "." && entry != ".."
+		    
+		    #Get all definitions
+    	  Dir.entries(File.join(tmp_swc_dir, entry)).each do |lib_path|
+    	    if lib_path != "." && lib_path != ".."
+    	      
+    	      #Open XML Catalog
+            catalog = REXML::Document.new( File.read(File.join(tmp_swc_dir, entry, lib_path, "catalog.xml")))
+            catalog.elements.each("*/libraries/library/script/def") do |definition|
+
+              #Is this it?
+              return File.join(tmp_swc_dir, entry, lib_path, definition.parent.parent.attributes["path"] ) if definition.attributes["id"].sub(".","/").sub(":","/") == linkage
+              
+            end
+    	    end
+    	  end
+    	end
+  	end
+	end
   
 end

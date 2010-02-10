@@ -1,0 +1,15 @@
+---
+default:
+    - debug: false
+      open: public/Main.swf
+      extra: -use-network=false
+    
+library-path:
+    - source/swc
+
+source-path:
+    - source/classes
+    
+applications:
+    - class: source/classes/Main.as
+      output: public/Main.swf

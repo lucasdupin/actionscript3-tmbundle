@@ -214,17 +214,17 @@ module FlexMate
 		#
 		def complete_import(word)
 			
-			scope  = ENV['TM_SCOPE']
-			line   = ENV['TM_CURRENT_LINE']
-			cp     = SourceTools.find_package(word)
+      scope  = ENV['TM_SCOPE']
+      line   = ENV['TM_CURRENT_LINE']
+      cp     = SourceTools.find_package(word)
+            
+      if scope =~ /asdoc/
+        cp = "@see #{cp}"
+      else
+        cp = "import #{cp}" unless line =~ /^\s*import/
+      end
       
-			if scope =~ /asdoc/
-				cp = "@see #{cp}"
-			else
-				cp = "import #{cp}" unless line =~ /^\s*import/
-			end
-
-			TextMate.exit_insert_snippet("#{cp};")
+      TextMate.exit_replace_text("#{cp};")
 			
 		end
 		

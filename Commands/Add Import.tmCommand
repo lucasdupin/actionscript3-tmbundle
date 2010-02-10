@@ -43,8 +43,8 @@ safe = 0
 indent = ""
 
 imps.each_with_index do |line,index|
-	if line =~ irgx		
-		TextMate.exit_insert_text(cla.sub(word,'')) if word != cla
+	if line =~ irgx	
+		TextMate.exit_insert_text(cla.sub(/#{word}/i,'')) if word != cla
 		TextMate.exit_show_tool_tip("#{word} already imported")
 	elsif line =~ /^(\s*)import\s+/
 		indent = $1
@@ -69,11 +69,11 @@ end
 	<key>keyEquivalent</key>
 	<string>@I</string>
 	<key>name</key>
-	<string>Import</string>
+	<string>Import Class</string>
 	<key>output</key>
 	<string>replaceDocument</string>
 	<key>scope</key>
-	<string>source.actionscript.3 meta.package.actionscript.3 meta.class.actionscript.3, meta.interface.actionscript.3</string>
+	<string>source.actionscript.3 meta.package.actionscript.3 meta.class.actionscript.3</string>
 	<key>uuid</key>
 	<string>B42093AC-0F65-4760-856C-23E51A54CD84</string>
 </dict>

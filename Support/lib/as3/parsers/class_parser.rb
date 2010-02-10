@@ -3,7 +3,7 @@
 
 ################################################################################
 #
-#		Copyright 2009 Simon Gregory
+#		Copyright 2009 Simon Gregory / Lucas Dupin
 #		
 #		This program is free software: you can redistribute it and/or modify
 #		it under the terms of the GNU General Public License as published by
@@ -486,10 +486,11 @@ class ClassParser
 	def create_src_list
 
 		if ENV['TM_PROJECT_DIRECTORY']
-
-			src_list = (ENV['TM_AS3_USUAL_SRC_DIRS'] != nil) ? ENV['TM_AS3_USUAL_SRC_DIRS'].gsub(':','|') : "src"
-			@src_dirs = `find -dE "$TM_PROJECT_DIRECTORY" -maxdepth 5 -regex '.*\/(#{src_list})' -print 2>/dev/null`
-
+			@src_dirs = ""             
+			source_path = SourceTools.common_src_dirs()
+			source_path.each do |path|
+			  @src_dirs += `find -d "$TM_PROJECT_DIRECTORY/$path" -maxdepth 5 -print 2>/dev/null`
+			end
 		end
 
 		cs = "#{@completion_src}/data/completions"
@@ -512,7 +513,7 @@ class ClassParser
 
  	end
 
-	# Helper for create_src_list
+	# Helper to create_src_list
 	#
 	def add_src_dir(path)
 		if File.directory?(path)
@@ -529,8 +530,7 @@ class ClassParser
 	def load_class(paths)
 
 		#urls=[]
-
-		@src_dirs.each do |d|
+    @src_dirs.each do |d|
 
 			paths.each do |path|
 
@@ -557,12 +557,23 @@ class ClassParser
 					log_append("Failing with '#{mxml_file}' as we need an mxml parser first - anyone?")
 					@exit_message = "WARNING: #{mxml_file} couldn't be loaded (mxml files are not yet supported)."
 					return nil
-
+					
 				end
 
 			end
 
 		end
+
+    #Not found in source paths... looking inside SWCs
+    paths.each do |p|
+      if SourceTools.has_definition_in_swc? p
+          
+          # Wow, there really is a definition for this in a SWC
+          # time to get a class structure for this file
+          return strip_comments(SourceTools.skeleton_for_swc_class(p))
+          
+      end
+    end
 
 		as_file = File.basename(paths[0])
 
@@ -572,6 +583,7 @@ class ClassParser
 
 		nil
 	end
+	
 
 	# Searches the given document for the import statement of the specified class,
 	# if located it returns it as a file path reference. Where no explicit import 
@@ -984,7 +996,7 @@ class ClassParser
 		# Set our depth counters to defaults.
 		@depth = 0
 		@type_depth = 0
-
+		
 		#doc = load_includes(doc,"#{ENV['TM_FILEPATH']}")
 		doc = strip_comments(doc)
 		
