@@ -25,7 +25,12 @@ module SourceTools
   # as the root directory for source files.
   #
   def self.common_src_dirs
-    src_dirs_matches = common_src_dir_list.split(":")
+    src_dirs_matches = []
+    AS3Project.source_path_list.each do |source_path|
+      source_path.gsub("/",".")
+      src_dirs_matches << source_path
+    end
+    src_dirs_matches << common_src_dir_list.split(":")
     src_dirs_matches
   end
 
@@ -41,7 +46,7 @@ module SourceTools
 
     # Collect all .as and .mxml files with a filename that contains the search
     # term. When used outside a project this step is skipped.
-    TextMate.each_text_file do |file|
+    TextMate.each_source_file do |file|
 
       if file =~ /\b#{word}\w*\.(as|mxml)$/i
 
@@ -346,4 +351,18 @@ module SourceTools
   	end
 	end
   
+end
+
+module  TextMate
+  # Making source searching relative to the source paths
+  def TextMate.each_source_file (&block)
+    project_dir = ENV['TM_PROJECT_DIRECTORY']
+    return if project_dir.nil?
+
+    AS3Project.source_path_list.each do |sp|
+        fullpath = File.join(project_dir, sp)
+        TextMate.scan_dir(fullpath, block, ProjectFileFilter.new)
+    end
+
+  end
 end
