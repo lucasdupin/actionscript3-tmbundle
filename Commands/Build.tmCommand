@@ -15,7 +15,7 @@ DAEMON="$TM_BUNDLE_SUPPORT/bin/fcshd.rb"
 BUILD="$TM_BUNDLE_SUPPORT/bin/as3project.rb"
 
 #build and run? NO
-export TM_BUILD_AND_RUN=
+export TM_BUILD_AND_RUN=0
 
 # Define $TM_PROJECT_DIR or warn the user if they're not working with a TM Project. 
 cd_to_tmproj_root

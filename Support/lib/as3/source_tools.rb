@@ -125,8 +125,25 @@ module SourceTools
 		{ :exact_matches => best_paths, :partial_matches => package_paths }
 	end
 	
+	# Searches for the definition of the given uri in
+	# the library's SWCs
+	#
+	# Returns a boolean
+	def self.has_definition_in_swc?(uri)
+	  
+	  # Make sure our library is up to date
+	  unpack_swcs
+	  
+	  # Search in catalog
+	  swc_definitions.each do |definition|
+	    return true if definition.sub('.','/').sub(':','/') == uri
+	  end
+	  
+	 false
+	end
+	
 
-  # Loads both bundle and project paths.
+  # Loads bundle, project and library paths.
   #
   def self.search_all_paths(word)
 

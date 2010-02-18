@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby -wKU
 
 require 'yaml'
+require ENV['TM_SUPPORT_PATH'] + '/lib/exit_codes'
 
 module AS3Project     
     
@@ -190,10 +191,9 @@ module AS3Project
     
     def self.compile()
       
-      #Only for build and run
-      files_compiled = 0
-      Dir.mkdir('/tmp/fcshd') if ! File.directory?('/tmp/fcshd')
-      
+      # Preparing for compilation verifications
+      Dir.mkdir("/tmp/fcshd") if not File.directory? "/tmp/fcshd"
+      `echo 0 > /tmp/fcshd/failed`
       
         mxmlc_applications.each do |app|
             printf('<b>Compiling %s</b>', app["klass"])
@@ -206,18 +206,17 @@ module AS3Project
                   exit 0;
               else
                 '#{@fcshd_gui}' -fail
-                echo 'true' > /tmp/fcshd/failed
+                echo 1 > /tmp/fcshd/failed
                 exit 1;
               fi
             ")  
             print '<br /><br />' 
-            
-            if result
-              files_compiled = files_compiled + 1
-              
-              #run if in Build and Run and all apps compiled
-              run() if files_compiled == mxmlc_applications.length && ENV["TM_BUILD_AND_RUN"] != ""
-            end
+        end
+        
+        # Build and run?
+        if ENV["TM_BUILD_AND_RUN"].to_i == 1 && `cat /tmp/fcshd/failed` =~ /^0.*/
+          run
+          FCSHD.close_window
         end
         
         return 0;
@@ -228,8 +227,9 @@ module AS3Project
           #checking if the default_run_file is local or remote
           if default_run_file.include?("://") #oh man, we have a protocol (http://, https://, ftp://)
             system("open #{default_run_file}")
-          end
+          else
             system("open #{File.join(@project, default_run_file)}")
+          end
         end
     end
     

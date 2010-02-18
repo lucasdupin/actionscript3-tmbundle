@@ -1,51 +1,23 @@
 #!/usr/bin/env ruby
 # encoding: utf-8
 
-require ENV['TM_SUPPORT_PATH'] + '/lib/escape'
-require ENV['TM_SUPPORT_PATH'] + '/lib/exit_codes'
-require ENV['TM_SUPPORT_PATH'] + '/lib/textmate'
-require ENV['TM_SUPPORT_PATH'] + '/lib/tm/process'
+require ENV['TM_BUNDLE_SUPPORT'] + '/bin/fcshd.rb'
+require ENV['TM_BUNDLE_SUPPORT'] + '/bin/as3project.rb'
 
 require File.expand_path(File.dirname(__FILE__)) + '/../lib/add_lib'
 
 require 'fm/flex_mate'
 require 'fm/sdk'
-require 'fm/compiler'
-require 'fm/settings'
-require 'as3/source_tools'
 
-#Check for custom build files and execute them where they exist.
-custom = "#{ENV['TM_PROJECT_DIRECTORY']}/#{ENV['TM_FLEX_BUILD_FILE']}"
-if File.file?(custom)
-  if File.executable?(custom)
-    TextMate::Process.run(custom) do |str|
-      STDOUT << str
-    end
-  else
-    puts "WARNING: #{custom} not executable."  
-  end
-  TextMate.exit_show_html
-end
-  
-if ENV['TM_PROJECT_DIRECTORY'] && ENV['TM_FLEX_USE_FCSH']
-  
-  #Requires are needed by FlexMate.required_settings + check_valid_paths
-  require ENV['TM_SUPPORT_PATH'] + '/lib/web_preview'
-  require ENV['TM_SUPPORT_PATH'] + '/lib/tm/htmloutput'
+#Require beein in a project
+FlexMate.require_tmproj
 
-  c = FlexMate::FcshCompiler.new
-  c.build
-  
-  TextMate.exit_discard
-  
-else
-  
-  STDOUT.sync = true
+#Add flex to path
+FlexMate::SDK.add_flex_bin_to_path
 
-  c = FlexMate::Compiler.new
-  c.build
-  
-  #TODO: Get the html window to show immediately.
-  TextMate.exit_show_html
+#Generate the beautiful header
+FCSHD.generate_view
 
-end
+# run the compiler and print filtered error messages
+FCSHD.start_server
+AS3Project.compile
