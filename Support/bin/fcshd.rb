@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby -wKU
-
 module FCSHD
 
 BUN_SUP = ENV['TM_BUNDLE_SUPPORT']
@@ -36,8 +35,8 @@ def self.generate_view
 		puts html_head(:window_title => "ActionScript 3", :page_title => "fcshd", :sub_title => "__" );
 
 		puts	"<link rel='stylesheet' href='file://#{e_url(BUN_SUP)}/css/fcshd.css' type='text/css' charset='utf-8' media='screen'>"
-		puts  "<script src='file://#{e_url(BUN_SUP)}/../js/fcshd.js' type='text/javascript' charset='utf-8'></script>"
-		puts "<div id='script-path'>#{BUN_SUP}/</div>"
+		puts  "<script src='file://#{e_url(BUN_SUP)}/js/fcshd.js' type='text/javascript' charset='utf-8'></script>"
+		puts "<div id='script-path'>#{BUN_SUP}/bin/</div>"
 		puts "
 		<h2><div id='status'>Checking daemon status</div></h2>
 		<div id='controls'>
@@ -51,14 +50,14 @@ end
 
 def self.stop_server
 	return unless server_status
-	`#{e_sh(BUN_SUP)}/fcshd.py --stop-server`
+	`#{e_sh(BUN_SUP)}/bin/fcshd.py --stop-server`
 	sleep 0.5
 	status
 end
 
 def self.start_server
 	return if server_status
-	`#{e_sh(BUN_SUP)}/fcshd.py --start-server`
+	`#{e_sh(BUN_SUP)}/bin/fcshd.py --start-server`
 	
 	#Give up from waiting if it's taking too long
 	start_time = Time.now.to_i
@@ -97,9 +96,17 @@ def run
   if ARGV[0] == "-success" 
     FCSHD.success
   elsif ARGV[0] == "-fail"
-    FCSHD.fail
-  elsif ARGV[0] == "-status"
-    FCSHD.status
+      FCSHD.fail
+    elsif ARGV[0] == "-status"
+      FCSHD.status
+    elsif ARGV[0] == "-start"
+      FCSHD.start_server
+    elsif ARGV[0] == "-stop"
+      FCSHD.stop_server
+    elsif ARGV[0] == "-view"
+      FCSHD.generate_view
+  else
+    "No command given"
   end
 end
 run

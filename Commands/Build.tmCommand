@@ -7,29 +7,10 @@
 	<key>bundleUUID</key>
 	<string>847E3C93-A096-4C8E-9EDA-3D313E4F0014</string>
 	<key>command</key>
-	<string># grab the utility functions and checks from the bundle
-. "$TM_BUNDLE_SUPPORT/lib/flex_utils.sh"
-
-# the relevant support scripts
-DAEMON="$TM_BUNDLE_SUPPORT/bin/fcshd.rb"
-BUILD="$TM_BUNDLE_SUPPORT/bin/as3project.rb"
-
-#build and run? NO
+	<string>#build and run? NO
 export TM_BUILD_AND_RUN=0
 
-# Define $TM_PROJECT_DIR or warn the user if they're not working with a TM Project. 
-cd_to_tmproj_root
-
-# make sure we have the files + paths needed for compilation
-try_to_add_flex_bin_to_PATH
-
-# print the header to the output window
-"$DAEMON" -view
-
-# run the compiler and print filtered error messages
-"$DAEMON" -start &gt; /dev/null                          
-"$BUILD" -compile
-</string>
+build.rb</string>
 	<key>input</key>
 	<string>none</string>
 	<key>keyEquivalent</key>

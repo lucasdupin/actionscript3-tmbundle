@@ -48,8 +48,9 @@ function refreshStatus()
     var scriptElt = document.getElementById('script-path')
     var scriptPath = scriptElt.firstChild.nodeValue
 	console.log( scriptPath + "fcshd.rb");
-    TextMate.system('"' + scriptPath + 'fcshd.rb" -status', 
+    TextMate.system('echo `"' + scriptPath + 'fcshd.rb" -status`', 
 	    function(e) {
+			console.log(e.outputString);
 	        if (e.outputString.match("Running"))
 			{
 	            setState('up')
@@ -61,7 +62,7 @@ function refreshStatus()
 	        } 
 			else
 			{
-				setState('unknown')
+				setState('unknown');
 			}
 	    })
 }
@@ -99,6 +100,7 @@ function toggleClick()
 			console.log('launching')
 			setState('launching')
 	
+			console.log('"' + scriptPath + 'fcshd.rb" -start');
 			TextMate.system('"' + scriptPath + 'fcshd.rb" -start', 
 				function(e) {
 
