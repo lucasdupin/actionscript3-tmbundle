@@ -20,8 +20,6 @@ try_to_add_flex_bin_to_PATH
 "$BUILD" -docs</string>
 	<key>input</key>
 	<string>none</string>
-	<key>keyEquivalent</key>
-	<string>@d</string>
 	<key>name</key>
 	<string>Build ASDocs</string>
 	<key>output</key>

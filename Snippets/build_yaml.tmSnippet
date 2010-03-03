@@ -17,7 +17,14 @@ source-path:
     
 applications:
     - class: source/classes/$1.as
-      output: public/$1.swf</string>
+      output: public/$1.swf
+
+# asdoc:
+#     - title: "My ActionScript project"
+#       footer: "My ActionScript project footer"
+#       output: /path/to/docs/
+#       exclude-dirs: 
+#         - source/classes/caurina/</string>
 	<key>name</key>
 	<string>build.yaml</string>
 	<key>scope</key>

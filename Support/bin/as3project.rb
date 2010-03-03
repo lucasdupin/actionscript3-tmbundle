@@ -15,7 +15,7 @@ module AS3Project
         if !@build_yaml:
             build_file_path = ENV['TM_FLEX_BUILD']          
 
-            if !build_file_path
+            if !build_file_path and not @project.nil?
                 build_file_path = File.join(@project, "build.yaml")
             end                                                   
                        

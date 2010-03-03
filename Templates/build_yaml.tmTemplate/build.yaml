@@ -12,4 +12,10 @@ source-path:
     
 applications:
     - class: source/classes/Main.as
-      output: public/Main.swf
+      output: public/Main.swf      
+# asdoc:
+#     - title: "My ActionScript project"
+#       footer: "My ActionScript project footer"
+#       output: /path/to/docs/
+#       exclude-dirs: 
+#         - source/classes/caurina/
