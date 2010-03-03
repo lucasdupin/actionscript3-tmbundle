@@ -16,6 +16,6 @@ applications:
 # asdoc:
 #     - title: "My ActionScript project"
 #       footer: "My ActionScript project footer"
-#       output: /path/to/docs/
+#       output: docs/
 #       exclude-dirs: 
 #         - source/classes/caurina/

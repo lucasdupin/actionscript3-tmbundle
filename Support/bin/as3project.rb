@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby -wKU
 
 require 'yaml'
+require ENV['TM_SUPPORT_PATH'] + '/lib/web_preview'
 require ENV['TM_SUPPORT_PATH'] + '/lib/exit_codes'
 
 module AS3Project     
@@ -139,7 +140,7 @@ module AS3Project
     end
     
     def self.asdocs_source_path()
-        paths = build_file.fetch("asdoc").fetch("source-path") rescue []
+        paths = build_file.fetch("asdoc")[0].fetch("source-path") rescue source_path_list
         source_path = []
         
         paths.each do |path|
@@ -150,7 +151,7 @@ module AS3Project
     end
     
     def self.asdocs_exclude_dirs()
-      build_file.fetch("asdoc").fetch("exclude-dirs") rescue []
+      build_file.fetch("asdoc")[0].fetch("exclude-dirs") rescue []
     end
     
     def self.asdocs_exclude_classes()
@@ -164,15 +165,15 @@ module AS3Project
     end
     
     def self.asdocs_title()
-      build_file.fetch("asdoc").fetch("title") rescue "ActionScript Project"
+      build_file.fetch("asdoc")[0].fetch("title") rescue "ActionScript Project"
     end
         
     def self.asdocs_footer()
-      build_file.fetch("asdoc").fetch("footer") rescue "ActionScript Project"
+      build_file.fetch("asdoc")[0].fetch("footer") rescue "ActionScript Project"
     end
     
     def self.asdocs_output()
-      File.join(@project, build_file.fetch("asdoc").fetch("output")) rescue ""
+      File.join(@project, build_file.fetch("asdoc")[0].fetch("output")) rescue ""
     end
     
     def self.asdocs()   
@@ -180,10 +181,13 @@ module AS3Project
       require 'find'
       require 'pathname'
       
+      puts html_head(:window_title => "ActionScript 3", :page_title => "ASDocs", :sub_title => "__" );
+      
       if build_file.has_key?("asdoc")
-         print("Running asdoc...<br /><br /><pre>")
+         print("<h2>Running ASDoc...</h2><pre>")
          system("#{ENV["TM_FLEX_PATH"]}/bin/asdoc -output #{asdocs_output} #{asdocs_source_path} #{mxmlc_library_path} #{mxmlc_source_path} #{asdocs_exclude_classes} -warnings=false -window-title '#{asdocs_title}' -main-title '#{asdocs_title}' -footer '#{asdocs_footer}'")
          print "</pre>"
+         print "<strong>Done!</strong>"
        else
          print "You have to set ASDocs settings on YAML file"
        end  
