@@ -128,52 +128,6 @@ module FCSHD_SERVER
       
       return false
     end
-
-
-    # 
-    # ############################################
-    # # If a parameter was provided, take action #
-    # ############################################
-    # 
-    # def init
-    #   begin
-    #     case ARGV[0]
-    #     when "--start-server"
-    #       daemon
-    #       #Build
-    #     when "--build"
-    #       ARGV[1, ARGV.length].each{ |arg|
-    #       # puts arg
-    #       http = Net::HTTP.new(HOST, PORT)
-    #       resp, date = http.post('/build', arg)
-    #       puts resp.body
-    #     }
-    #     exit
-    # 
-    #     #Tells server to exit
-    #     when "--stop-server"
-    #       http = Net::HTTP.new(HOST, PORT)
-    #       resp, date = http.get('/exit')
-    #       puts resp.body
-    #       exit
-    #     end
-    # 
-    #     # When asking for the server and it refuses the connectio
-    #     # mainly it's because the service is down
-    #     # soooooo... let's start it!
-    #   rescue Errno::ECONNREFUSED
-    # 
-    #     exit(1) if ARGV[0] == "exit"
-    # 
-    #     puts "Server is down... starting it up, run this command again"
-    #     daemon
-    # 
-    #     #Other errors
-    #   rescue => e
-    #     puts "Invalid command: #{e}"
-    #     exit(1)
-    #   end
-    # end
     
   end
 end
