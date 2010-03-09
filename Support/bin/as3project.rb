@@ -10,8 +10,8 @@ require ENV['TM_BUNDLE_SUPPORT'] + '/lib/fm/mxmlc_exhaust'
 
 module AS3Project     
   
-    # @logger = Logger.new('/tmp/fcshd/gui.log')
-    # @logger.level = Logger::DEBUG
+    @logger = Logger.new('/tmp/fcshd/gui.log')
+    @logger.level = Logger::DEBUG
     
     @project = ENV['TM_PROJECT_DIRECTORY']                               
     @build_yaml = nil
@@ -208,6 +208,7 @@ module AS3Project
             puts "<pre>"
             result = FCSHD_SERVER.build(app["mxmlc"])
             result.each_line do |line|
+              puts line
               mxmlc_parser.line line
             end
             puts "</pre>"
