@@ -235,7 +235,7 @@ module AS3Project
 end     
 
 
-def run       
+def init    
     if !ARGV.empty?
         AS3Project.compile() if ARGV[0] == "-compile"
         AS3Project.run() if ARGV[0] == "-run"
@@ -244,4 +244,4 @@ def run
         
 end
 
-run
+init

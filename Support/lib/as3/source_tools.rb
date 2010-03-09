@@ -255,28 +255,30 @@ module SourceTools
 	    Dir.mkdir lib_path unless File.directory? lib_path
 	    
 	    #Unpack files in this folder
-	    Dir.entries(File.join(project, p)).each do |entry|
-	      #is it an swc?
-	      if File.extname(entry) == ".swc"
+	    if File.file? File.join(project, p)
+	      Dir.entries(File.join(project, p)).each do |entry|
+  	      #is it an swc?
+  	      if File.extname(entry) == ".swc"
 	        
-	        #Full path to file
-	        swc_path = File.join(project, p, entry)
-	        extraction_path = File.join lib_path, entry.sub(".swc","")
+  	        #Full path to file
+  	        swc_path = File.join(project, p, entry)
+  	        extraction_path = File.join lib_path, entry.sub(".swc","")
 	        
-	        #Checking if file changed
-	        stamp = File.stat(swc_path).mtime.to_i.to_s
+  	        #Checking if file changed
+  	        stamp = File.stat(swc_path).mtime.to_i.to_s
 	        
-	        #checking if the file need to be extracted
-	        if !File.exists? File.join(extraction_path, stamp)
-	          #removing old entries
-	          `rm -rf #{extraction_path}`
-	          #swc found, time to unzip it
-            `unzip #{swc_path} -d #{extraction_path}`
-  	        #create md5
-  	        `touch #{File.join(extraction_path, stamp)}`
-	        end
+  	        #checking if the file need to be extracted
+  	        if !File.exists? File.join(extraction_path, stamp)
+  	          #removing old entries
+  	          `rm -rf #{extraction_path}`
+  	          #swc found, time to unzip it
+              `unzip #{swc_path} -d #{extraction_path}`
+    	        #create md5
+    	        `touch #{File.join(extraction_path, stamp)}`
+  	        end
 
-	      end
+  	      end
+  	    end
 	    end
 	    
 	  end
