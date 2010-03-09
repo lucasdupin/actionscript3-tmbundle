@@ -1,0 +1,4 @@
+- Check problem with lib path outside of the project
+- Check problem when some users report the debugger is not launching
+- Variable definition Snippet
+- SWC Completion

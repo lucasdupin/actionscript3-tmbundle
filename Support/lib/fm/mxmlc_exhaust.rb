@@ -91,7 +91,7 @@ class MxmlcExhaust
       match = @unable_to_open_regex.match(str)
       unless match === nil
         @error_count += 1
-        return "\n <h4>File does not exist</h4>\n #{out}"
+        return "\n File does not exist\n #{out}"
       end
 
       match = @config_file_regex.match(str)
