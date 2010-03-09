@@ -212,10 +212,16 @@ module AS3Project
             
         end
         
-        # Build and run?
-        if ENV["TM_BUILD_AND_RUN"].to_i == 1 && mxmlc_parser.error_count <= 0
-          run
-          FCSHD.close_window
+        if mxmlc_parser.error_count <= 0
+          FCSHD.success
+          
+          if ENV["TM_BUILD_AND_RUN"].to_i == 1
+            run
+            FCSHD.close_window
+          end
+          
+        else
+          FCSHD.fail
         end
         
         return 0;
