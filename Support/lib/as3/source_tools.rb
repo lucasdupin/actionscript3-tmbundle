@@ -9,6 +9,8 @@ require 'rexml/document'
 # packages.
 #
 module SourceTools
+  
+  @logger = Logger.new("/tmp/fcshd/swc.log")
 
   # Returns an colon seperated list of directory names
   # that are commonly used as the root directory for source files.
@@ -251,11 +253,13 @@ module SourceTools
 	    #Where to unpack
 	    lib_path = File.join(tmp_swc_dir, p.sub("/","_"))
 	    
+	    @logger.debug("swc path: #{p} will be unpacked into: #{lib_path}")
+	    
 	    #Create a directory in the temp folder for holding the unpacked files
 	    Dir.mkdir lib_path unless File.directory? lib_path
 	    
 	    #Unpack files in this folder
-	    if File.file? File.join(project, p)
+	    if File.exists? File.join(project, p)
 	      Dir.entries(File.join(project, p)).each do |entry|
   	      #is it an swc?
   	      if File.extname(entry) == ".swc"
