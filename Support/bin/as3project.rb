@@ -10,8 +10,8 @@ require ENV['TM_BUNDLE_SUPPORT'] + '/lib/fm/mxmlc_exhaust'
 
 module AS3Project     
   
-    @logger = Logger.new('/tmp/fcshd/gui.log')
-    @logger.level = Logger::DEBUG
+    # @logger = Logger.new('/tmp/fcshd/gui.log')
+    # @logger.level = Logger::DEBUG
     
     @project = ENV['TM_PROJECT_DIRECTORY']                               
     @build_yaml = nil
