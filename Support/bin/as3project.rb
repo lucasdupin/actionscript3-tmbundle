@@ -200,13 +200,15 @@ module AS3Project
     def self.compile()
       
         mxmlc_parser = MxmlcExhaust.new
+        mxmlc_parser.print_output = true
       
         mxmlc_applications.each do |app|
             printf('<b>Compiling %s</b>', app["klass"])
             
             result = FCSHD_SERVER.build(app["mxmlc"])
             result.each_line do |line|
-              puts mxmlc_parser.line(line)
+              puts line
+              mxmlc_parser.line line
             end
             mxmlc_parser.complete
             

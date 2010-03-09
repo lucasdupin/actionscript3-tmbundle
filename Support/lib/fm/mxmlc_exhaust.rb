@@ -33,6 +33,7 @@ class MxmlcExhaust
     @config_file_regex    = /(^Loading configuration file )(.*)$/
     @recompile_file_regex = /(^Recompile: )(.*)$/
     @reason_file_regex    = /(^.*, )(.*,)(.*)$/
+    @unable_to_open_regex = /(^Error: unable to open).*/
 
   end
 
@@ -85,6 +86,12 @@ class MxmlcExhaust
         @error_count += 1
         @last_match = ERROR_WARN_MATCH
         return out
+      end
+      
+      match = @unable_to_open_regex.match(str)
+      unless match === nil
+        @error_count += 1
+        return "\n <h4>File does not exist</h4>\n #{out}"
       end
 
       match = @config_file_regex.match(str)
