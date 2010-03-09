@@ -4,11 +4,15 @@ require 'yaml'
 require ENV['TM_SUPPORT_PATH'] + '/lib/web_preview'
 require ENV['TM_SUPPORT_PATH'] + '/lib/exit_codes'
 
+require ENV['TM_BUNDLE_SUPPORT'] + '/bin/fcshd_server'
+require ENV['TM_BUNDLE_SUPPORT'] + '/bin/fcshd'
+require ENV['TM_BUNDLE_SUPPORT'] + '/lib/fm/mxmlc_exhaust'
+
 module AS3Project     
+  
+    @logger = Logger.new('/tmp/fcshd/gui.log')
+    @logger.level = Logger::DEBUG
     
-    @fcshd = File.join(ENV["TM_BUNDLE_SUPPORT"], "bin/fcshd.py")
-    @output_parser = File.join(ENV["TM_BUNDLE_SUPPORT"], "bin/parse_mxmlc_out.rb")
-    @fcshd_gui = File.join(ENV["TM_BUNDLE_SUPPORT"], "bin/fcshd.rb")
     @project = ENV['TM_PROJECT_DIRECTORY']                               
     @build_yaml = nil
     
@@ -185,7 +189,7 @@ module AS3Project
       
       if build_file.has_key?("asdoc")
          print("<h2>Running ASDoc...</h2><pre>")
-         system("#{ENV["TM_FLEX_PATH"]}/bin/asdoc -output #{asdocs_output} #{asdocs_source_path} #{mxmlc_library_path} #{mxmlc_source_path} #{asdocs_exclude_classes} -warnings=false -window-title '#{asdocs_title}' -main-title '#{asdocs_title}' -footer '#{asdocs_footer}'")
+         system("#{ENV["TM_FLEX_PATH"]}/bi  n/asdoc -output #{asdocs_output} #{asdocs_source_path} #{mxmlc_library_path} #{mxmlc_source_path} #{asdocs_exclude_classes} -warnings=false -window-title '#{asdocs_title}' -main-title '#{asdocs_title}' -footer '#{asdocs_footer}'")
          print "</pre>"
          print "<strong>Done!</strong>"
        else
@@ -195,30 +199,21 @@ module AS3Project
     
     def self.compile()
       
-      # Preparing for compilation verifications
-      Dir.mkdir("/tmp/fcshd") if not File.directory? "/tmp/fcshd"
-      `echo 0 > /tmp/fcshd/failed`
+        mxmlc_parser = MxmlcExhaust.new
       
         mxmlc_applications.each do |app|
             printf('<b>Compiling %s</b>', app["klass"])
             
-            result = system("
-              '#{@fcshd}' '#{app["mxmlc"]}' 2>&1 | '#{@output_parser}'; 
-              if [ ${PIPESTATUS[0]} -eq 0 ]
-                then
-                  '#{@fcshd_gui}' -success;
-                  exit 0;
-              else
-                '#{@fcshd_gui}' -fail
-                echo 1 > /tmp/fcshd/failed
-                exit 1;
-              fi
-            ")  
-            print '<br /><br />' 
+            result = FCSHD_SERVER.build(app["mxmlc"])
+            result.each_line do |line|
+              puts mxmlc_parser.line(line)
+            end
+            mxmlc_parser.complete
+            
         end
         
         # Build and run?
-        if ENV["TM_BUILD_AND_RUN"].to_i == 1 && `cat /tmp/fcshd/failed` =~ /^0.*/
+        if ENV["TM_BUILD_AND_RUN"].to_i == 1 && mxmlc_parser.error_count <= 0
           run
           FCSHD.close_window
         end

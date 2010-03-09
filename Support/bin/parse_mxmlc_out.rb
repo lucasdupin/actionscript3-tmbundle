@@ -8,17 +8,19 @@
  
 STDOUT.sync = true
  
-error_count = 0;
-daemon_error_regex = /(^XML-RPC Error)(.*)$/
+error_count          = 0;
+daemon_error_regex   = /(^XML-RPC Error)(.*)$/
 error_and_warn_regex = /(\/.*?)(\(([0-9]+)\)|):.*(Error|Warning):\s*(.*)$/
-config_file_regex = /(^Loading configuration file )(.*)$/
+config_file_regex    = /(^Loading configuration file )(.*)$/
 recompile_file_regex = /(^Recompile: )(.*)$/
-reason_file_regex = /(^.*, )(.*,)(.*)$/
+reason_file_regex    = /(^.*, )(.*,)(.*)$/
+
  
 #Constants to track switches in matches - to introduce extra breaks.
-CONFIGURATION_MATCH = "configuration_match"
-ERROR_WARN_MATCH = "error_warn_match"
+CONFIGURATION_MATCH    = "configuration_match"
+ERROR_WARN_MATCH       = "error_warn_match"
 RECOMPILE_REASON_MATCH = "recompile_reason_match"
+
  
 last_match = ""
              

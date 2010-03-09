@@ -8,22 +8,13 @@ require 'Logger'
 require ENV['TM_SUPPORT_PATH'] + '/lib/escape'
 require ENV['TM_SUPPORT_PATH'] + '/lib/web_preview'
 
-$server = XMLRPC::Client.new2("http://localhost:2345")
-# @logger = Logger.new('/tmp/fcshd/gui.log')
-# @logger.level = Logger::WARN
+require ENV['TM_BUNDLE_SUPPORT'] + '/bin/fcshd_server'
 
-def self.server_status
-	begin
-		result = $server.call("no_existent_mehtod")
-	rescue Errno::ECONNREFUSED => e
-		return false
-	rescue XMLRPC::FaultException => e
-		return true
-	end
-end
+# @logger = Logger.new('/tmp/fcshd/gui.log')
+# @logger.level = Logger::DEBUG
 
 def self.status
-	if server_status
+	if FCSHD_SERVER.running
 		puts "Running"
 	else
 		puts "Stopped"
@@ -44,24 +35,24 @@ def self.generate_view
 		  <a id='toggle' href='javascript:toggleClick();'>Toggle State</a><br/>
 		</div>"
 		
-		compiler_state = server_status ? "up" : "down"
+		compiler_state = FCSHD_SERVER.running ? "up" : "down"
 		puts '<script type="text/javascript" charset="utf-8">setState("'+compiler_state+'")</script>'
 end
 
 def self.stop_server
-	return unless server_status
-	`#{e_sh(BUN_SUP)}/bin/fcshd.py --stop-server`
+	return unless FCSHD_SERVER.running
+	FCSHD_SERVER.stop_server
 	sleep 0.5
 	status
 end
 
 def self.start_server
-	return if server_status
-	`#{e_sh(BUN_SUP)}/bin/fcshd.py --start-server`
+	return if FCSHD_SERVER.running
+	FCSHD_SERVER.start_server
 	
 	#Give up from waiting if it's taking too long
 	start_time = Time.now.to_i
-	while !server_status
+	while !FCSHD_SERVER.running
 	 sleep 0.5
 	 break if Time.now.to_i - start_time > 1000 * 10
 	end
