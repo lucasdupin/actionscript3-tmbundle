@@ -54,23 +54,25 @@ module FCSHD_SERVER
     			fcsh.puts req.body
     			output = read_to_prompt(fcsh)
     			match = output.scan(ASSIGNED_REGEXP)
-    			log.debug(output)
-    			log.debug(match)
-    			log.debug(match[0])
     			@commands[req.body] = match[0][0]
     		end
+    		
+    		log.debug("asked: #{req.body}")
+    		log.debug("output: #{output}")
 
     		res.body = output
     		res['Content-Type'] = "text/html"
     	}
 
     	s.mount_proc("/exit"){|req, res|
+    	  log.debug("shutting down")
     		s.shutdown
     		fcsh.close
     		exit
     	}
     	
     	s.mount_proc("/status"){|req, res|
+    	  log.debug("getting status")
     		res.body = "UP"
     		exit
     	}
