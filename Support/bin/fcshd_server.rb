@@ -12,7 +12,7 @@ module FCSHD_SERVER
   
   class << self
     
-    PORT = 2345
+    PORT = 6924
     HOST = "localhost"
 
     ASSIGNED_REGEXP = /^ fcsh:.*(\d+).*/
@@ -23,7 +23,10 @@ module FCSHD_SERVER
       Daemons.daemonize
       
       @commands = Hash.new if @commands.nil?
+      
+      Dir.mkdir("/tmp/fcshd") unless File.directory? "/tmp/fcshd"
       log = Logger.new("/tmp/fcshd/server.log")
+      log.debug("initializing server")
       # 
     	fcsh = IO.popen("#{ENV['TM_FLEX_PATH']}/bin/fcsh  2>&1", "w+")
     	read_to_prompt(fcsh)
