@@ -16,7 +16,7 @@
 	<key>output</key>
 	<string>showAsHTML</string>
 	<key>scope</key>
-	<string>source.actionscript.3, text.xml.mxml, text.xml.flex-config, comment.block.documentation.asdoc</string>
+	<string>source.actionscript.3, text.xml.mxml, text.xml.flex-config, comment.block.documentation.asdoc, source.yaml</string>
 	<key>uuid</key>
 	<string>629207C9-0E62-4D1C-A66D-2F8542D64C75</string>
 </dict>

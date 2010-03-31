@@ -2,3 +2,5 @@
 - Sometimes the debugger does not launch
 - Variable definition Snippet
 - SWC Completion
+- Fix Target not found in fcsh
+- Parse fcsh error message when build yaml has errors
