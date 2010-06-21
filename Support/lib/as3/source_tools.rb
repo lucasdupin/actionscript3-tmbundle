@@ -251,12 +251,12 @@ module SourceTools
 	  AS3Project.libray_path_list.each do |p|
 	    
 	    #Where to unpack
-	    lib_path = File.join(tmp_swc_dir, p.sub("/","_"))
+	    lib_path = File.join(tmp_swc_dir, p.gsub("/","_"))
 	    
       # @logger.debug("swc path: #{p} will be unpacked into: #{lib_path}")
 	    
 	    #Create a directory in the temp folder for holding the unpacked files
-	    Dir.mkdir lib_path unless File.directory? lib_path
+	    FileUtils.mkdir_p lib_path
 	    
 	    #Unpack files in this folder
 	    if File.exists? File.join(project, p)
@@ -295,10 +295,7 @@ module SourceTools
 	  
 	  #Create unique dir per project
 	  @dir = "/tmp/fcshd/swcs" + Digest::MD5.hexdigest("#{ENV['TM_PROJECT_DIRECTORY']}")
-	  
-	  #Check if temp dir exists, then create
-	  Dir.mkdir "/tmp/fcshd" unless File.directory? "/tmp/fcshd"
-	  Dir.mkdir @dir unless File.directory? @dir
+	  FileUtils.mkdir_p @dir unless File.directory? @dir
   	 
   	@dir 
 	end
@@ -330,6 +327,7 @@ module SourceTools
 	  
 	  # for each library entry
 		Dir.entries(tmp_swc_dir).each do |entry|
+		  # Check if it's a directory and it's  not myself or my parent
 		  if File.directory?(File.join(tmp_swc_dir, entry)) && entry != "." && entry != ".."
 		    
 		    #Get all definitions
