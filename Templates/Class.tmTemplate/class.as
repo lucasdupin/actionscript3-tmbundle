@@ -11,7 +11,7 @@ package ${TM_CLASS_PATH}
  * Class.
  * 
  * @langversion ActionScript 3.0
- * @playerversion Flash 9.0
+ * @playerversion Flash 10.0
  * 
  * @author ${TM_FULLNAME}
  * @since  ${TM_DATE}

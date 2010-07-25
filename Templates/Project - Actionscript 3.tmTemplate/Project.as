@@ -1,9 +1,3 @@
-//AS3///////////////////////////////////////////////////////////////////////////
-// 
-// Copyright ${TM_YEAR} ${TM_ORGANIZATION_NAME:-$TM_FULLNAME}
-// 
-////////////////////////////////////////////////////////////////////////////////
-
 package
 {
 
@@ -14,7 +8,7 @@ import flash.display.Sprite;
  * Application entry point for ${TM_NEW_FILE_BASENAME}.
  * 
  * @langversion ActionScript 3.0
- * @playerversion Flash 9.0
+ * @playerversion Flash 10.0
  * 
  * @author ${TM_FULLNAME}
  * @since ${TM_DATE}
@@ -27,16 +21,18 @@ public class ${TM_NEW_FILE_BASENAME} extends Sprite
 	 */
 	public function ${TM_NEW_FILE_BASENAME}()
 	{
-		super();
-		stage.addEventListener( Event.ENTER_FRAME, initialize );
+		if(stage)
+			init();
+		else
+			stage.addEventListener( Event.ADDED_TO_STAGE, init );
 	}
 
 	/**
 	 * Initialize stub.
 	 */
-	private function initialize(event:Event):void
+	private function init(event:Event=null):void
 	{
-		stage.removeEventListener( Event.ENTER_FRAME, initialize );
+		stage.removeEventListener( Event.ADDED_TO_STAGE, init );
 		trace( "${TM_NEW_FILE_BASENAME}::initialize()" );
 	}
 	

@@ -13,7 +13,7 @@ import flash.events.Event;
  * Event subclass.
  * 
  * @langversion ActionScript 3.0
- * @playerversion Flash 9.0
+ * @playerversion Flash 10.0
  * 
  * @author ${TM_FULLNAME}
  * @since  ${TM_DATE}
