@@ -1,24 +1,38 @@
 #!/usr/bin/env ruby -wKU
 module FCSHD
-
+	
 BUN_SUP = ENV['TM_BUNDLE_SUPPORT']
 
 require 'xmlrpc/client'
 require 'Logger'
 require ENV['TM_SUPPORT_PATH'] + '/lib/escape'
 require ENV['TM_SUPPORT_PATH'] + '/lib/web_preview'
+require ENV['TM_BUNDLE_SUPPORT'] + '/lib/fm/flex_mate'
+require ENV['TM_BUNDLE_SUPPORT'] + '/lib/fm/sdk'
 
-require ENV['TM_BUNDLE_SUPPORT'] + '/bin/fcshd_server'
+
+#Add flex to path
+FlexMate::SDK.add_flex_bin_to_path
+
 
 # @logger = Logger.new('/tmp/fcshd/gui.log')
 # @logger.level = Logger::DEBUG
 
+def self.invoke_task task
+	rakefile_path = e_sh(BUN_SUP + "/data/Rakefile")
+	`PROJECT_PATH=#{e_sh(ENV['TM_PROJECT_DIRECTORY'])} PATH=#{e_sh ENV['PATH']}  rake -f #{rakefile_path} #{task}`
+end
+
 def self.status
-	if FCSHD_SERVER.running
-		puts "Running"
-	else
-		puts "Stopped"
-	end
+	invoke_task('status').gsub(/\(.+\)/, '').strip
+end
+
+def self.running
+	self.status == "up"
+end
+
+def self.update_status
+	set_status self.status
 end
 
 def self.generate_view compiler_state=nil
@@ -33,35 +47,23 @@ def self.generate_view compiler_state=nil
 		<div id='controls'>
 		  <a id='refresh' href='javascript:refreshStatus()' title='Check daemon status'>Check Status</a><br/>
 		  <a id='toggle' href='javascript:toggleClick();'>Toggle State</a><br/>
-		</div>"
+		</div>
+		<pre>"
 		
-		compiler_state = FCSHD_SERVER.running ? "up" : "down" if compiler_state.nil?
-    # self.set_status(compiler_state)
-		set_status compiler_state
+		set_status self.status
 end
 
 def self.set_status compiler_state
-    puts '<script type="text/javascript" charset="utf-8">setState("'+compiler_state+'")</script>'
+	puts '<script type="text/javascript" charset="utf-8">setState("'+compiler_state+'")</script>'
 end
 
 def self.stop_server
-	return unless FCSHD_SERVER.running
-	FCSHD_SERVER.stop_server
-	sleep 1
-	status
+	invoke_task('stop_server')
 end
 
 def self.start_server
-	return if FCSHD_SERVER.running
-	FCSHD_SERVER.start_server
-	
-	#Give up from waiting if it's taking too long
-	start_time = Time.now.to_i
-	while !FCSHD_SERVER.running
-	 sleep 0.5
-	 break if Time.now.to_i - start_time > 1000 * 10
-	end
-
+	invoke_task('start_server')
+	sleep 2
 end
 
 def self.success
@@ -94,7 +96,7 @@ def run
   elsif ARGV[0] == "-fail"
       FCSHD.fail
     elsif ARGV[0] == "-status"
-      FCSHD.status
+      puts FCSHD.status
     elsif ARGV[0] == "-start"
       FCSHD.start_server
     elsif ARGV[0] == "-stop"

@@ -1,8 +1,6 @@
-document.title = "Flex shell daemon status"
-
 function setState(newState)
 {
-    console.log('state -> ' + newState)
+    console.log('state -> "' + newState + '"')
 
     var statusMsg = ""
     var linkMsg = ""
@@ -11,16 +9,16 @@ function setState(newState)
         case "up":
         	statusMsg = "Daemon is running"
         	linkMsg = "Stop"
-        break
+        break;
 
         case "down":
         	statusMsg = "Daemon is down"
         	linkMsg = "Start"
-        break
+        break;
 
         case "launching":
         	statusMsg = "Launching..."
-        break
+        break;
 
 		case "stopping":
 			statusMsg = "Daemon is stopping..."
@@ -31,6 +29,7 @@ function setState(newState)
 		break;
 		
         case "unknown":
+		default:
         	statusMsg = "Unknown..."
         break;
 
@@ -47,23 +46,9 @@ function refreshStatus()
 {
     var scriptElt = document.getElementById('script-path')
     var scriptPath = scriptElt.firstChild.nodeValue
-	console.log( scriptPath + "fcshd.rb");
-    TextMate.system('echo `"' + scriptPath + 'fcshd.rb" -status`', 
+	TextMate.system('echo `"' + scriptPath + 'fcshd.rb" -status`', 
 	    function(e) {
-			console.log(e.outputString);
-	        if (e.outputString.match("Running"))
-			{
-	            setState('up')
-
-	        }
-			else if (e.outputString.match("Stopped"))
-			{
-	            setState('down')
-	        } 
-			else
-			{
-				setState('unknown');
-			}
+			setState(e.outputString.replace("\n", ""));
 	    })
 }
 

@@ -13,18 +13,13 @@ module AS3Project
     # @logger = Logger.new('/tmp/fcshd/gui.log')
     # @logger.level = Logger::DEBUG
     
-    @project = ENV['TM_PROJECT_DIRECTORY']                               
+    @project = ENV['TM_PROJECT_DIRECTORY']
     @build_yaml = nil
     
     def self.build_file
         if !@build_yaml:
-            build_file_path = ENV['TM_FLEX_BUILD']          
-
-            if !build_file_path and not @project.nil?
-                build_file_path = File.join(@project, "build.yaml")
-            end                                                   
-                       
-            if !file = File.open(build_file_path) rescue nil 
+            
+			if !file = File.open(build_file_path) rescue nil 
                 printf('Could not find the build file at %s', build_file_path)
                 exit
             end
@@ -37,7 +32,17 @@ module AS3Project
         end        
         
         @build_yaml
-    end    
+    end  
+
+  	def self.build_file_path
+  		path = ENV['TM_FLEX_BUILD']
+
+        if !path and not @project.nil?
+            path = File.join(@project, "build.yaml")
+        end
+		path
+		
+  	end
     
     def self.get_path_list(attr_name)
         dirs = []                    
@@ -142,44 +147,7 @@ module AS3Project
             
         apps
     end
-    
-    def self.asdocs_source_path()
-        paths = build_file.fetch("asdoc")[0].fetch("source-path") rescue source_path_list
-        source_path = []
-        
-        paths.each do |path|
-            source_path.push "-doc-sources+="+File.join(@project, path)
-        end                                 
-        
-        source_path.join(" ")
-    end
-    
-    def self.asdocs_exclude_dirs()
-      build_file.fetch("asdoc")[0].fetch("exclude-dirs") rescue []
-    end
-    
-    def self.asdocs_exclude_classes()
-      to_exclude = []
 
-      definitions(asdocs_exclude_dirs, source_path_list).each do |path|
-        to_exclude.push("-exclude-classes+="+path[1])
-      end
-      
-      to_exclude.join(" ")
-    end
-    
-    def self.asdocs_title()
-      build_file.fetch("asdoc")[0].fetch("title") rescue "ActionScript Project"
-    end
-        
-    def self.asdocs_footer()
-      build_file.fetch("asdoc")[0].fetch("footer") rescue "ActionScript Project"
-    end
-    
-    def self.asdocs_output()
-      File.join(@project, build_file.fetch("asdoc")[0].fetch("output")) rescue ""
-    end
-    
     def self.asdocs()   
       
       require 'find'
@@ -189,7 +157,7 @@ module AS3Project
       
       if build_file.has_key?("asdoc")
          print("<h2>Running ASDoc...</h2><pre>")
-         system("#{ENV["TM_FLEX_PATH"]}/bin/asdoc -output #{asdocs_output} #{asdocs_source_path} #{mxmlc_library_path} #{mxmlc_source_path} #{asdocs_exclude_classes} -warnings=false -window-title '#{asdocs_title}' -main-title '#{asdocs_title}' -footer '#{asdocs_footer}'")
+		 system("rake doc")
          print "</pre>"
          print "<strong>Done!</strong>"
        else

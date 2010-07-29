@@ -7,10 +7,7 @@
 	<key>bundleUUID</key>
 	<string>847E3C93-A096-4C8E-9EDA-3D313E4F0014</string>
 	<key>command</key>
-	<string>#build and run? NO
-export TM_BUILD_AND_RUN=1
-
-build.rb</string>
+	<string>build.rb run</string>
 	<key>input</key>
 	<string>none</string>
 	<key>keyEquivalent</key>
