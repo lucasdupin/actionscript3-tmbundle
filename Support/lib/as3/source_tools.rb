@@ -41,6 +41,7 @@ module SourceTools
   #
   def self.search_project_paths(word)
 
+	source_paths = AS3Project.library_path_list + AS3Project.source_path_list
     project = "#{ENV['TM_PROJECT_DIRECTORY']}"
 
     best_paths = []
@@ -52,6 +53,8 @@ module SourceTools
 
       if file =~ /\b#{word}\w*\.(as|mxml)$/i
 
+		path = file
+		source_paths.each {|sp| path.sub!(File.join(project, sp), "")}
         path = file.sub( project, "")
         path = truncate_to_src(path)
         path = path.gsub(/\.(as|mxml)$/,'').gsub( "/", ".").sub(/^\./,'')
