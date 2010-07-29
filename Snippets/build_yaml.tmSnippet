@@ -5,9 +5,9 @@
 	<key>content</key>
 	<string>---
 default:
-    - debug: false
-      open: public/${1:Main}.swf
-      extra: -use-network=false -static-link-runtime-shared-libraries
+    debug: false
+    open: public/${1:Main}.swf
+    extras: -use-network=false -static-link-runtime-shared-libraries
     
 library-path:
     - ${2:source/swc}
@@ -20,11 +20,11 @@ applications:
       output: public/$1.swf
 
 # asdoc:
-#     - title: "My ActionScript project"
-#       footer: "My ActionScript project footer"
-#       output: docs/
-#       exclude-dirs: 
-#         - source/classes/caurina/</string>
+#     title: "My ActionScript project"
+#     footer: "My ActionScript project footer"
+#     output: docs/
+#     exclude-dirs: 
+#       - source/classes/caurina/</string>
 	<key>name</key>
 	<string>build.yaml</string>
 	<key>scope</key>

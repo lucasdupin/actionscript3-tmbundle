@@ -248,7 +248,7 @@ module SourceTools
 	  project = "#{ENV['TM_PROJECT_DIRECTORY']}"
 	  
 	  #Loop through library, searching for SWC paths
-	  AS3Project.libray_path_list.each do |p|
+	  AS3Project.library_path_list.each do |p|
 	    
 	    #Where to unpack
 	    lib_path = File.join(tmp_swc_dir, p.gsub("/","_"))
@@ -381,6 +381,10 @@ module  TextMate
     return if project_dir.nil?
 
     AS3Project.source_path_list.each do |sp|
+        fullpath = File.join(project_dir, sp)
+        TextMate.scan_dir(fullpath, block, ProjectFileFilter.new)
+    end
+	AS3Project.library_path_list.each do |sp|
         fullpath = File.join(project_dir, sp)
         TextMate.scan_dir(fullpath, block, ProjectFileFilter.new)
     end

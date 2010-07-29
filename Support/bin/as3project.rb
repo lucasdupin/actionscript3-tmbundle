@@ -80,7 +80,7 @@ module AS3Project
         get_path_list("source-path")
     end
                                           
-    def self.libray_path_list
+    def self.library_path_list
         get_path_list("library-path")
     end
     
@@ -96,7 +96,7 @@ module AS3Project
     end       
     
     def self.mxmlc_library_path
-        paths = libray_path_list
+        paths = library_path_list
         library_path = []
         
         paths.each do |path|
