@@ -100,8 +100,8 @@ private
 
 def get_compile_line(input, output)
 
-    libs_path    = @config["library-path"].map{ |lib| "-library-path+=#{escape(File.join(current_path, lib))}"}.join(" ")
-    sources_path = @config["source-path"].map{ |lib| "-sp+=#{escape(File.join(current_path, lib))}"}.join(" ")
+    libs_path    = (@config["library-path"] || []).map{ |lib| "-library-path+=#{escape(File.join(current_path, lib))}"}.join(" ")
+    sources_path = (@config["source-path"] || []).map{ |lib| "-sp+=#{escape(File.join(current_path, lib))}"}.join(" ")
 
     #Making sure the link report folder exists
     link_report_file = File.join("/tmp", input)
@@ -112,8 +112,7 @@ def get_compile_line(input, output)
     #Excluding some clases
     @config["link_report"].each do |l|
         line += " -load-externs=/tmp/#{l['exclude']}" if l['from'] == input
-    end
-    #puts line
+    end unless @config["link_report"].nil?
 
     line
 end
