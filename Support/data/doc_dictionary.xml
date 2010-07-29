@@ -1361,7 +1361,6 @@
 <a href="mxml/xml.html">XML</a>
 <a href="mxml/xmlList.html">XMLList</a>
 <!-- mxml-only -->
-
 <!-- Flash Player 10 Text Engine -->
 <a href='flash/text/engine/BreakOpportunity.html'>BreakOpportunity</a>
 <a href='flash/text/engine/CFFHinting.html'>CFFHinting</a>
@@ -1395,5 +1394,5 @@
 <a href='flash/text/engine/TextLineValidity.html'>TextLineValidity</a>
 <a href='flash/text/engine/TextRotation.html'>TextRotation</a>
 <a href='flash/text/engine/TypographicCase.html'>TypographicCase</a>
-
+<!-- Flash Player 10 Text Engine -->
 </dict>

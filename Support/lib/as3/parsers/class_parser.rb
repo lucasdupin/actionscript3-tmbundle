@@ -1,8 +1,9 @@
 #!/usr/bin/env ruby
+# encoding: utf-8
 
 ################################################################################
 #
-#		Copyright 2009 Simon Gregory
+#		Copyright 2009 Simon Gregory / Lucas Dupin
 #		
 #		This program is free software: you can redistribute it and/or modify
 #		it under the terms of the GNU General Public License as published by
@@ -318,7 +319,7 @@ class ClassParser
 			    @getsets << $2.to_s
 			elsif line =~ @i_face.methods
 				if $5 != nil and $2 != nil
-					@methods << "#{$1.to_s}(#{$2.to_s}):#{$5.to_s}"
+					@methods << "#{$1.to_s}(#{$2.to_s}):#{$5.to_s}"					
 				else
 					method_scans << $1
 				end		
@@ -433,7 +434,7 @@ class ClassParser
 		store_interface_members(doc)
 
 		ip = load_interface_parents(doc)
-	  next_docs = ip[:parents] || nil
+	  next_docs = ip[:parents] || nil if ip
 		
 		unless next_docs.nil? or next_docs.empty?
 			next_docs.each { |d| add_interface(d) }
@@ -485,25 +486,11 @@ class ClassParser
 	def create_src_list
 
 		if ENV['TM_PROJECT_DIRECTORY']
-
-			src_list = '"src"'
-			
-			# This isn't working properly yet as it only matches the top level lib
-			# within the Proj.
-			#if ENV['TM_AS3_USUAL_SRC_DIRS'] != nil
-			#	src_a = ENV['TM_AS3_USUAL_SRC_DIRS'].split(":")
-			#	src_list = '"' + src_a.pop() + '"'
-			#	src_a.each do |d|
-			#		src_list += ' -or -name "'+d+'"'
-			#	end
-			#end
-			
-			# Note Errors are redirected and suppressed (ie Permissions Errors)
-			source_path = ENV["TM_FLEX_SOURCE"].split(':')
+			@src_dirs = ""             
+			source_path = SourceTools.common_src_dirs()
 			source_path.each do |path|
 			  @src_dirs += `find -d "$TM_PROJECT_DIRECTORY/$path" -maxdepth 5 -print 2>/dev/null`
 			end
-			
 		end
 
 		cs = "#{@completion_src}/data/completions"
@@ -519,14 +506,14 @@ class ClassParser
 		# otherwise go looking for the sdk.
 		unless add_src_dir("#{cs}/frameworks/flex_3")
 			fx = FlexMate::SDK.src
-			add_src_dir(fx)
+			add_src_dir(fx) unless fx.nil?
 		end
 
 		#log_append( "src_dirs " + @src_dirs )
 
  	end
 
-	# Helper for create_src_list
+	# Helper to create_src_list
 	#
 	def add_src_dir(path)
 		if File.directory?(path)
@@ -543,8 +530,7 @@ class ClassParser
 	def load_class(paths)
 
 		#urls=[]
-
-		@src_dirs.each do |d|
+    @src_dirs.each do |d|
 
 			paths.each do |path|
 
@@ -571,12 +557,23 @@ class ClassParser
 					log_append("Failing with '#{mxml_file}' as we need an mxml parser first - anyone?")
 					@exit_message = "WARNING: #{mxml_file} couldn't be loaded (mxml files are not yet supported)."
 					return nil
-
+					
 				end
 
 			end
 
 		end
+
+    #Not found in source paths... looking inside SWCs
+    paths.each do |p|
+      if SourceTools.has_definition_in_swc? p
+          
+          # Wow, there really is a definition for this in a SWC
+          # time to get a class structure for this file
+          return strip_comments(SourceTools.skeleton_for_swc_class(p))
+          
+      end
+    end
 
 		as_file = File.basename(paths[0])
 
@@ -586,6 +583,7 @@ class ClassParser
 
 		nil
 	end
+	
 
 	# Searches the given document for the import statement of the specified class,
 	# if located it returns it as a file path reference. Where no explicit import 
@@ -998,7 +996,7 @@ class ClassParser
 		# Set our depth counters to defaults.
 		@depth = 0
 		@type_depth = 0
-
+		
 		#doc = load_includes(doc,"#{ENV['TM_FILEPATH']}")
 		doc = strip_comments(doc)
 		
@@ -1048,6 +1046,49 @@ class ClassParser
 		end
 
 		# TODO: Check type of method return statements.
+
+	end
+	
+	# Returns a list of class paths that satisfy reference or word.
+	#
+	def path_list(doc, reference, word)
+		
+		#Where the word and ref don't match and it 
+		#looks like a Class name switch to it.
+		if reference != word
+			if word =~ /^[A-Z]/
+				reference = word
+			end
+		end
+		
+		type = find_type(doc, reference)
+		
+		return [] unless type
+		
+	  paths = imported_class_to_file_path(doc, type)
+
+		create_src_list()
+		existing_paths = []
+
+		@src_dirs.each do |d|
+
+			paths.each do |path|
+
+				uri = d.chomp + "/" + path.chomp
+				as = "#{uri}.as"
+				mx = "#{uri}.mxml"
+
+				if File.exists?(as)
+					existing_paths << as
+				elsif File.exists?(mx)
+					existing_paths << mx
+				end
+
+			end
+
+		end
+
+		existing_paths.uniq
 
 	end
 
