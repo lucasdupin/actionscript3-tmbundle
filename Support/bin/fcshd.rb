@@ -46,8 +46,7 @@ def self.generate_view compiler_state=nil
 		<div id='controls'>
 		  <a id='refresh' href='javascript:refreshStatus()' title='Check daemon status'>Check Status</a><br/>
 		  <a id='toggle' href='javascript:toggleClick();'>Toggle State</a><br/>
-		</div>
-		<pre>"
+		</div>"
 		
 		set_status self.status
 end

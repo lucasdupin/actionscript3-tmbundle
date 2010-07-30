@@ -169,20 +169,30 @@ module AS3Project
       
         mxmlc_parser = MxmlcExhaust.new
         mxmlc_parser.print_output = true
-      
-        mxmlc_applications.each do |app|
-            printf('<h3>Compiling %s</h3>', app["klass"])
-            
-            puts "<pre>"
-            result = FCSHD_SERVER.build(app["mxmlc"])
-            result.each_line do |line|
-              puts line
-              mxmlc_parser.line line
-            end
-            puts "</pre>"
-            mxmlc_parser.complete
-            
+
+		# Build
+		puts "<pre>"
+		result = FCSHD.invoke_task("build")
+		result.each_line do |line|
+          puts line
+          mxmlc_parser.line line
         end
+        puts "</pre>"
+        mxmlc_parser.complete
+
+		# mxmlc_applications.each do |app|
+		#             printf('<h3>Compiling %s</h3>', app["klass"])
+		#             
+		#             puts "<pre>"
+		#             result = FCSHD_SERVER.build(app["mxmlc"])
+		#             result.each_line do |line|
+		#               puts line
+		#               mxmlc_parser.line line
+		#             end
+		#             puts "</pre>"
+		#             mxmlc_parser.complete
+		#             
+		#         end
         
         if mxmlc_parser.error_count <= 0
           FCSHD.success
