@@ -11,4 +11,4 @@ FCSHD.generate_view
 #Update status if needed
 FCSHD.update_status
 
-AS3Project.compile
+AS3Project.compile ARGV.size > 0 and ARGV[0] == 'run'

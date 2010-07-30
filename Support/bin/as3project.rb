@@ -107,15 +107,15 @@ module AS3Project
     end                          
     
     def self.mxmlc_default_extra
-        build_file.fetch("default")[0].fetch("extra") rescue ""
+        build_file.fetch("default").fetch("extra") rescue ""
     end
     
     def self.mxmlc_default_debug                             
-        build_file.fetch("default")[0].fetch("debug") rescue "false"
+        build_file.fetch("default").fetch("debug") rescue "false"
     end   
     
     def self.default_run_file
-        build_file.fetch("default")[0].fetch("open") rescue ""
+        build_file.fetch("default").fetch("open") rescue ""
     end
     
     def self.mxmlc_applications
@@ -165,7 +165,7 @@ module AS3Project
        end  
     end
     
-    def self.compile()
+    def self.compile(open_if_no_errors)
       
         mxmlc_parser = MxmlcExhaust.new
         mxmlc_parser.print_output = true
@@ -197,7 +197,7 @@ module AS3Project
         if mxmlc_parser.error_count <= 0
           FCSHD.success
           
-          if ENV["TM_BUILD_AND_RUN"].to_i == 1
+          if open_if_no_errors
             run
             FCSHD.close_window
           end
