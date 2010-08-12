@@ -69,14 +69,8 @@ function toggleClick()
         		function(e) {
         		    console.log('stdout: ' + e.outputString)
         		    console.log('stderr: ' + e.errorString)
-        		    if (e.outputString.match("Stopped"))
-					{
-        		        setState('down')
-        		    } 
-					else
-					{
-        		        console.log('but no match: "' + e.outputString + '" vs "STOPPED"')
-        		    }
+
+					refreshStatus();
         		});
         break;
 
@@ -91,21 +85,9 @@ function toggleClick()
 
 					console.log('stdout: ' + e.outputString)
 					console.log('stderr: ' + e.errorString)
-	
-					if (e.outputString.match("Running"))
-					{
-						setState('up')
-					} 
-					else if (e.outputString.match("Stopped"))
-					{
-						setState('down')
-					}
-					else
-					{
-						setState('unknown')
-					}
+					
+					refreshStatus();
 				})
-	
 		break;
  
 		case 'launching':
