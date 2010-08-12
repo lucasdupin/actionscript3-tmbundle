@@ -1,4 +1,3 @@
-- Check problem with lib path outside of the project
 - Sometimes the debugger does not launch
 - Variable definition Snippet
 - SWC Completion

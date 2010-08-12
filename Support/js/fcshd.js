@@ -52,6 +52,24 @@ function refreshStatus()
 	    })
 }
 
+function compile(buildAndRun) {
+	var scriptElt = document.getElementById('script-path')
+    var scriptPath = scriptElt.firstChild.nodeValue
+	//Running command
+	TextMate.system('echo `"' + scriptPath + 'as3project.rb" -compile ' + buildAndRun + '`', 
+	    function(e) {
+			console.log('stdout: ' + e.outputString)
+		    console.log('stderr: ' + e.errorString)
+			document.getElementById("output").innerHTML = e.outputString.replace("\n", "");
+			
+			//Progress indicator
+			TextMate.isBusy = false;
+	    })
+	//Progress indicator
+	TextMate.isBusy = true;
+}
+
+
 function toggleClick()
 {
     var scriptElt = document.getElementById('script-path')

@@ -55,6 +55,11 @@ def self.set_status compiler_state
 	puts '<script type="text/javascript" charset="utf-8">setState("'+compiler_state+'")</script>'
 end
 
+def self.async_compile run=false
+	run = run.to_s
+	puts '<script type="text/javascript" charset="utf-8">compile('+ run +')</script>'
+end
+
 def self.stop_server
 	invoke_task('stop_server')
 end

@@ -25,7 +25,7 @@ task :build do
 
     task_logger.info "Connection refused, trying to start the server"
 	puts "Server is down... starting it up" 
-	`rake #{__FILE__} start_server`
+	`rake '#{__FILE__}' start_server`
 	sleep 2
 	Rake::Task[:build].execute
           

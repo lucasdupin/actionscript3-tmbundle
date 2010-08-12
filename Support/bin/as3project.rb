@@ -107,15 +107,15 @@ module AS3Project
     end                          
     
     def self.mxmlc_default_extra
-        build_file.fetch("default").fetch("extra") rescue ""
+        build_file.fetch("default")[0].fetch("extras") rescue ""
     end
     
     def self.mxmlc_default_debug                             
-        build_file.fetch("default").fetch("debug") rescue "false"
+        build_file.fetch("default")[0].fetch("debug") rescue "false"
     end   
     
     def self.default_run_file
-        build_file.fetch("default").fetch("open") rescue ""
+        build_file.fetch("default")[0].fetch("open") rescue ""
     end
     
     def self.mxmlc_applications
@@ -165,48 +165,31 @@ module AS3Project
        end  
     end
     
-    def self.compile(open_if_no_errors)
+    def self.compile(build_and_run)
       
         mxmlc_parser = MxmlcExhaust.new
         mxmlc_parser.print_output = true
 
 		# Build
 		puts "<pre>"
-		result = FCSHD.invoke_task("build")
+		result = FCSHD.invoke_task "build"
 		result.each_line do |line|
-          puts line
-          mxmlc_parser.line line
-        end
+			mxmlc_parser.line line
+		end
         puts "</pre>"
         mxmlc_parser.complete
 
-		# mxmlc_applications.each do |app|
-		#             printf('<h3>Compiling %s</h3>', app["klass"])
-		#             
-		#             puts "<pre>"
-		#             result = FCSHD_SERVER.build(app["mxmlc"])
-		#             result.each_line do |line|
-		#               puts line
-		#               mxmlc_parser.line line
-		#             end
-		#             puts "</pre>"
-		#             mxmlc_parser.complete
-		#             
-		#         end
-        
         if mxmlc_parser.error_count <= 0
-          FCSHD.success
-          
-          if open_if_no_errors
+          FCSHD.success          
+          if build_and_run
             run
             FCSHD.close_window
           end
-          
         else
           FCSHD.fail
         end
         
-        return 0;
+		mxmlc_parser.error_count
     end 
     
     def self.run() 
@@ -220,12 +203,27 @@ module AS3Project
         end
     end
     
+	private
+	
+	def self.read_to_prompt f
+		f.flush
+        output = ""
+        while chunk = f.read(1)
+            STDOUT.write chunk
+            output << chunk
+            if output =~ /^\(fcsh\)/
+                break
+            end
+        end
+        STDOUT.write ">"
+        output
+	end
 end     
 
 
 def init    
     if !ARGV.empty?
-        AS3Project.compile() if ARGV[0] == "-compile"
+        AS3Project.compile(ARGV[1] == "true") if ARGV[0] == "-compile"
         AS3Project.run() if ARGV[0] == "-run"
         AS3Project.asdocs() if ARGV[0] == "-docs"
     end

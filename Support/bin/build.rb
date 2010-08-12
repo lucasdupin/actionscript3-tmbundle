@@ -8,7 +8,5 @@ require File.expand_path(File.dirname(__FILE__)) + '/../lib/add_lib'
 #Generate the beautiful header
 FCSHD.generate_view
 
-#Update status if needed
-FCSHD.update_status
-
 AS3Project.compile ARGV.size > 0 and ARGV[0] == 'run'
+# FCSHD.async_compile ARGV.size > 0 and ARGV[0] == 'run'
