@@ -1,8 +1,8 @@
 ---
 default:
-    debug: true
-    open: public/index-debug.html
-    extras: -use-network=false -static-link-runtime-shared-libraries
+    - debug: true
+      open: public/index-debug.html
+      extras: -use-network=false -static-link-runtime-shared-libraries
     
 library-path:
     - source/swc
