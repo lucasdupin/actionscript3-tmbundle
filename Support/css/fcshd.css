@@ -37,3 +37,8 @@
 {
     display:none;
 }
+
+
+span.mxmlc_error {
+	color: #ff0000;
+}

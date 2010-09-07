@@ -32,7 +32,7 @@ class MxmlcExhaust
     @error_and_warn_regex = /(\/.*?)(\(([0-9]+)\)|):.*(Error|Warning):\s*(.*)$/
     @config_file_regex    = /(^Loading configuration file )(.*)$/
     @recompile_file_regex = /(^Recompile: )(.*)$/
-    @reason_file_regex    = /(^.*, )(.*,)(.*)$/
+    @reason_file_regex    = /^\s*(.*, )(.*),(.*)$/
     @unable_to_open_regex = /(^Error: unable to open).*/
 
   end
@@ -75,13 +75,13 @@ class MxmlcExhaust
                 '" href="txmt://open?url=file://' + match[1] + '">' +
                 File.basename( match[1] ) + '</a><br/>'
         else
-          out << 'Error <a title="Click to show error." href="txmt://open?url=file://' + match[1] +
+          out << '<span class="mxmlc_error">Error <a title="Click to show error." href="txmt://open?url=file://' + match[1] +
                 '&line='+ match[3] +
                 '" >' + match[5] +
                 '</a> at line ' + match[3] +
                 ' in <a title="'+match[1] +
                 '" href="txmt://open?url=file://' + match[1] + '">' +
-                File.basename( match[1] ) + '</a><br/>'
+                File.basename( match[1] ) + '</a></span><br/>'
         end
         @error_count += 1
         @last_match = ERROR_WARN_MATCH
@@ -105,9 +105,9 @@ class MxmlcExhaust
 
       match = @recompile_file_regex.match(str)
       unless match === nil
-          out << "<br/>" if @last_match != RECOMPILE_REASON_MATCH
-          out << 'Recompiling: <a title="Click to open ' + match[2] +
-          '" href="txmt://open?url=file://' + match[2] + '" >' + File.basename( match[2] )+'</a><br/>'
+          # out << "<br/>" if @last_match != RECOMPILE_REASON_MATCH
+          # out << 'Recompiling: <a title="Click to open ' + match[2] +
+          # '" href="txmt://open?url=file://' + match[2] + '" >' + File.basename( match[2] )+'</a><br/>'
           @last_match = RECOMPILE_REASON_MATCH
           return out
       end
@@ -121,10 +121,10 @@ class MxmlcExhaust
           return out
       end
 
-      if str =~ /^(.*\.swf)( \([0-9].*$)/
+      if str =~ /^(.*\/(.+\.swf))( \([0-9].*$)/
           cmd = "open #{e_sh($1)}"
           out << '<script type="text/javascript" charset="utf-8">function openSwf(){TextMate.system(\''+cmd+'\', null);}</script>'
-          out << "<br/><a href='javascript:openSwf()' title='Click to run (if there is space in the file path this may not work).'>#{$1}</a>#{$2}<br/>"
+          out << "<br/><a href='javascript:openSwf()' title='Click to run (if there is space in the file path this may not work).'>#{$2}</a>#{$3}<br/>"
       end
 
     rescue TypeError
