@@ -5,9 +5,9 @@
 	<key>content</key>
 	<string>---
 default:
-    debug: false
-    open: public/${1:Main}.swf
-    extras: -use-network=false -static-link-runtime-shared-libraries
+    - debug: false
+      open: public/${1:Main}.swf
+      extras: -use-network=false -static-link-runtime-shared-libraries
     
 library-path:
     - ${2:source/swc}
