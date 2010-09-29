@@ -18,6 +18,7 @@ source-path:
 applications:
     - class: source/classes/$1.as
       output: public/$1.swf
+      # exclude: source/classes/Other.as
 
 # asdoc:
 #     title: "My ActionScript project"

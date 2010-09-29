@@ -14,7 +14,7 @@ task :build do
 	
   # Command we'll send to the server
   what = config["applications"].map do |v|
-      get_compile_line(v["class"], v["output"])
+      get_compile_line(v["class"], v["output"], v["exclude"])
   end
 
   server = FCSHDServer.new
@@ -111,23 +111,42 @@ end
 
 private
 
-def get_compile_line(input, output)
+def get_compile_line(input, output, exclude)
 
+    # Get libs path (SWC)
     libs_path    = (config["library-path"] || []).map{ |lib| "-library-path+=#{escape(File.join(current_path, lib))}"}.join(" ")
+    # Get sources path (.as)
     sources_path = (config["source-path"] || []).map{ |lib| "-sp+=#{escape(File.join(current_path, lib))}"}.join(" ")
+    # Generate compilation line
+    line = "mxmlc #{escape(File.join(current_path, input))} -o=#{escape(File.join(current_path, output))} -debug=#{config['default'][0]['debug']} #{libs_path} #{sources_path} #{config['default'][0]['extras']}"
 
-    #Making sure the link report folder exists
-    link_report_file = File.join("/tmp", input)
-    FileUtils.mkdir_p File.dirname(link_report_file)
-
-    line = "mxmlc #{escape(File.join(current_path, input))} -o=#{escape(File.join(current_path, output))} -debug=#{config['default'][0]['debug']} #{libs_path} #{sources_path} #{config['default'][0]['extras']} -link-report=#{escape(link_report_file)}"
-
+    # Checking for link report
+    if require_report input
+      #Making sure the link report folder exists
+      link_report_file = File.join("/tmp/fcshd/reports/", input)
+      FileUtils.mkdir_p File.dirname(link_report_file)
+      # Appending the link report stuff
+      line += " -link-report=#{escape(link_report_file)}"
+    end
+    
     #Excluding some clases
-    config["link_report"].each do |l|
-        line += " -load-externs=/tmp/#{l['exclude']}" if l['from'] == input
-    end unless config["link_report"].nil?
+    
+    exclude.each do |l|
+        line += " -load-externs=/tmp/fcshd/reports/#{l}"
+    end unless exclude.nil?
 
     line
+end
+
+# Checks if input needs to generate a report file
+def require_report(input)
+  config["applications"].each do |app|
+      app["exclude"].each do |exclude|
+        return true if exclude == input
+      end unless app["exclude"].nil?
+  end
+  
+  false
 end
 
 def current_path
