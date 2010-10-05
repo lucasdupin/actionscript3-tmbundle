@@ -31,9 +31,6 @@ end
 def self.invoke_task task
 	`#{get_task task}`
 end
-def self.async_task task
-  system(get_task task)
-end
 
 def self.status
 	invoke_task('status').gsub(/\(.+\)/, '').strip
