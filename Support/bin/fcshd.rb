@@ -8,16 +8,10 @@ require 'Logger'
 require ENV['TM_SUPPORT_PATH'] + '/lib/escape'
 require ENV['TM_SUPPORT_PATH'] + '/lib/web_preview'
 
-
-#Add flex to path
-
-
 # @logger = Logger.new('/tmp/fcshd/gui.log')
 # @logger.level = Logger::DEBUG
 
 def self.get_task task
-  require ENV['TM_BUNDLE_SUPPORT'] + '/lib/fm/sdk'
-	FlexMate::SDK.add_flex_bin_to_path
   "PROJECT_PATH=#{e_sh(ENV['TM_PROJECT_DIRECTORY'])} PATH=#{e_sh ENV['PATH']}  rake -f #{e_sh(rakefile_path)} #{task}"
 end
 
