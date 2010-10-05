@@ -16,11 +16,13 @@ unless FlexMate::SDK.add_flex_bin_to_path
   unless ENV["TM_FLEX_PATH"]
     puts "Could not find the Flex SDK, please set TM_FLEX_PATH"
     exit
-  end
+  end 
   unless File.exists? ENV["TM_FLEX_PATH"]+"/bin/mxmlc"
     puts "Could not find the Flex SDK in the given path"
     exit
   end
+  puts "Could not find Flex SDK"
+  exit
 end
 
 
