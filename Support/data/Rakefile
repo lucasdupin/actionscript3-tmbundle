@@ -32,7 +32,7 @@ task :build do
   end
 end
 
-desc "Opens default file and tail the flashlog"
+desc "Opens default file"
 task :open do
 	
   # get the current 'open' value relative to the Rakefile path
@@ -117,8 +117,11 @@ def get_compile_line(input, output, exclude)
     libs_path    = (config["library-path"] || []).map{ |lib| "-library-path+=#{escape(File.join(current_path, lib))}"}.join(" ")
     # Get sources path (.as)
     sources_path = (config["source-path"] || []).map{ |lib| "-sp+=#{escape(File.join(current_path, lib))}"}.join(" ")
+    #Params
+    extras = (config['default'][0]['extras'] rescue "")
+    debug = (config['default'][0]['debug'] rescue "")
     # Generate compilation line
-    line = "mxmlc #{escape(File.join(current_path, input))} -o=#{escape(File.join(current_path, output))} -debug=#{config['default'][0]['debug']} #{libs_path} #{sources_path} #{config['default'][0]['extras']}"
+    line = "mxmlc #{escape(File.join(current_path, input))} -o=#{escape(File.join(current_path, output))} -debug=#{debug} #{libs_path} #{sources_path} #{extras}"
 
     # Checking for link report
     if require_report input
