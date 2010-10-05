@@ -12,13 +12,14 @@ require 'fm/sdk'
 FCSHD.generate_view
 
 #Add flex to path
-unless FlexMate::SDK.add_flex_bin_to_path
-  unless ENV["TM_FLEX_PATH"]
+FlexMate::SDK.add_flex_bin_to_path
+if `which fcsh`.empty?
+  if ENV["TM_FLEX_PATH"].empty?
     puts "Could not find the Flex SDK, please set TM_FLEX_PATH"
     exit
   end 
-  unless File.exists? ENV["TM_FLEX_PATH"]+"/bin/mxmlc"
-    puts "Could not find the Flex SDK in the given path"
+  unless File.exists? ENV["TM_FLEX_PATH"]+"/bin/fcsh"
+    puts "Could not find the Flex SDK in the given path: " + ENV["TM_FLEX_PATH"]+"/bin/fcsh"
     exit
   end
   puts "Could not find Flex SDK"
