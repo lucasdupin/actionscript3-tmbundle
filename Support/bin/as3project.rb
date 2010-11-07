@@ -51,7 +51,7 @@ module AS3Project
         if build_file.has_key?(attr_name)
             build_file.fetch(attr_name).each do |path|
                 dirs.push path
-            end
+            end rescue []
         end
         
         dirs
