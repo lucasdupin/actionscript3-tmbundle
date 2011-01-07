@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby -wKU
 
 require 'yaml'
+require ENV['TM_SUPPORT_PATH'] + "/lib/io"
 require ENV['TM_SUPPORT_PATH'] + '/lib/web_preview'
 require ENV['TM_SUPPORT_PATH'] + '/lib/exit_codes'
 
@@ -50,7 +51,7 @@ module AS3Project
         if build_file.has_key?(attr_name)
             build_file.fetch(attr_name).each do |path|
                 dirs.push path
-            end
+            end rescue []
         end
         
         dirs
@@ -167,27 +168,35 @@ module AS3Project
     
     def self.compile(build_and_run)
       
-        mxmlc_parser = MxmlcExhaust.new
-        mxmlc_parser.print_output = true
-
-		# Build
-		puts "<pre>"
-		result = FCSHD.invoke_task "build"
-		result.each_line do |line|
-			mxmlc_parser.line line
-		end
-        puts "</pre>"
-        mxmlc_parser.complete
-
-        if mxmlc_parser.error_count <= 0
-          FCSHD.success          
-          if build_and_run
-            run
-            FCSHD.close_window
-          end
-        else
-          FCSHD.fail
+      # Build
+  		puts "<pre>"
+      # Create the output parser
+      mxmlc_parser = MxmlcExhaust.new
+      mxmlc_parser.print_output = true
+      
+      require "open3"
+  		Open3.popen3(FCSHD.get_task "build") do |stdin, stdout, stderr|
+  		  all_output = ''
+  		  
+        TextMate::IO.exhaust(:out => stdout, :err => stderr) do |data|
+  		    data.each_line do |line|
+  			    mxmlc_parser.line line
+  		    end
         end
+  		end
+
+      puts "</pre>"
+      mxmlc_parser.complete
+
+      if mxmlc_parser.error_count <= 0
+        FCSHD.success          
+        if build_and_run
+          run
+          FCSHD.close_window
+        end
+      else
+        FCSHD.fail
+      end
         
 		mxmlc_parser.error_count
     end 
