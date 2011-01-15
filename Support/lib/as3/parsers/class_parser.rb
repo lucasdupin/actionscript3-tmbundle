@@ -502,10 +502,11 @@ class ClassParser
 		add_src_dir("#{cs}/frameworks/flash_ide")
 		add_src_dir("#{cs}/frameworks/flash_cs3")
 
-        # SWC definitions
-        AS3Project.dump_path_list.each do |p|
-            add_src_dir(p);
-        end
+    # SWC definitions
+    AS3Project.dump_swcs
+    AS3Project.dump_path_list.each do |p|
+        add_src_dir(p);
+    end
 
 		# Where we have access to the compressed flex 3 files use them,
 		# otherwise go looking for the sdk.
