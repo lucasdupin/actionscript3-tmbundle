@@ -175,7 +175,7 @@ module AS3Project
       mxmlc_parser.print_output = true
       
       require "open3"
-  		Open3.popen3(FCSHD.get_task "build") do |stdin, stdout, stderr|
+  		Open3.popen3(FCSHD.get_task("build")) do |stdin, stdout, stderr|
   		  all_output = ''
   		  
         TextMate::IO.exhaust(:out => stdout, :err => stderr) do |data|
