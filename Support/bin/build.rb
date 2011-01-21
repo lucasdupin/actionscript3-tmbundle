@@ -5,6 +5,7 @@ require ENV['TM_BUNDLE_SUPPORT'] + '/bin/fcshd.rb'
 require ENV['TM_BUNDLE_SUPPORT'] + '/bin/as3project.rb'
 
 require File.expand_path(File.dirname(__FILE__)) + '/../lib/add_lib'
+require 'find'
 require 'fm/flex_mate'
 require 'fm/sdk'
 

@@ -238,7 +238,7 @@ module FlexMate
 		def snippetize_method_params(str)
 			i=0
 			str.gsub!( /\n|\s/,"")
-			str.gsub!( /([a-zA-Z0-9\:\.\*=]+?)([,\)])/ ) {
+			str.gsub!( /([a-zA-Z0-9_'"\:\.\*=]+?)([,\)])/ ) {
 				"${" + String(i+=1) + ":" + $1 + "}" + $2
 			}
 			str
@@ -301,10 +301,11 @@ module FlexMate
 				# Use a default block if none was provided
 				block ||= lambda do |choice|
 
-					suffix = choice['data'].sub!( "#{choice['match']}", '')
+					suffix = choice['data'].sub!("#{choice['match']}", '')
 					suffix = self.snippetize_method_params(suffix)
-					suffix += ";" if choice['typeof'] == "void"
-
+					suffix += ";" if choice['typeof'] == 'void'
+					suffix
+					
 				end
 
 				# The block should return the text to insert as a snippet
@@ -318,7 +319,7 @@ module FlexMate
 			end
 
 		end
-
+		
 		# Register the completions menu icons with TM DIALOG.
 		#
 		def register_completion_images
@@ -392,16 +393,6 @@ if __FILE__ == $0
   require ENV['TM_SUPPORT_PATH'] + '/lib/ui'
   require ENV['TM_SUPPORT_PATH'] + '/lib/textmate'
 
-	puts "\nsnippetize_method_params:"
-	puts FlexMate.snippetize_method_params( "method(one:Number,two:String,three:*, four:Test=10, ...rest)")
-	puts FlexMate.snippetize_method_params( "method(one:Number,
-												two:String,
-													three:*,
-														four:Test, ...rest);")
-
-	#TODO/FIX: Following line fails.
-	puts FlexMate.snippetize_method_params( "method(zero:Number,four:String=\"chalk\",six:String=BIG_EVENT,three:Boolean=true)")
-
 	print "\ncheck_for_leopard: "
 	puts FlexMate.check_for_leopard
 
@@ -409,7 +400,7 @@ if __FILE__ == $0
 	puts FlexMate.has_dialog2.to_s
 	
 	#FIX: This test hangs TM.
-	#FlexMate.tooltip("Test Message")  
+	FlexMate.tooltip("Test Message")  
 
 	#ENV['TM_FLEX_FILE_SPECS'] = '/Users/simon/Desktop/golf_plus.xml'
 	#ENV['TM_FLEX_OUTPUT'] = '/Users/simon/Desktop/golf_plus.swf'
@@ -420,6 +411,5 @@ if __FILE__ == $0
 	##s = {}
 	#
 	#FlexMate.required_settings(s)
-
 
 end

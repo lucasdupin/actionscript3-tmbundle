@@ -50,6 +50,12 @@ module SourceTools
     best_paths = []
     package_paths = []
 
+    begin
+      TextMate.min_support(11850) #Actually we need > 11850 but I'm waiting for Allan to bump it up.
+    rescue SystemExit => e
+      TextMate.exit_discard
+    end
+
     # Collect all .as and .mxml files with a filename that contains the search
     # term. When used outside a project this step is skipped.
     TextMate.each_source_file do |file|
@@ -63,7 +69,7 @@ module SourceTools
         path = truncate_to_src(path)
         path = path.gsub(/\.(as|mxml)$/,'').gsub( "/", ".").sub(/^\./,'')
 
-        if path =~ /\.#{word}$/i
+        if path =~ /\b#{word}$/
           best_paths << path
         else
           package_paths << path
@@ -71,14 +77,15 @@ module SourceTools
 
       end
 
-    end
+    end rescue TextMate.exit_show_html('Please upgrade TM Support to the most recent revision.
+    See the bundle README\'s <a href="http://github.com/simongregory/actionscript3-tmbundle">Known Issues</a>')
 
     { :exact_matches => best_paths, :partial_matches => package_paths }
 
   end
 
-  # Loads all paths stored in the bundle lookup that have a filename which
-  # contains the requested word.
+  # Loads all paths stored in the bundle lookup dictionary that have a filename
+  # which contains the requested word.
   #
   def self.search_bundle_paths(word)
 
@@ -95,7 +102,7 @@ module SourceTools
 
         if $2
           path = $2.gsub('package.html#', '').gsub('/', '.')
-        else          
+        else
             path = $1.gsub('/', '.')
         end
 
@@ -179,53 +186,80 @@ module SourceTools
     end
 
   end
-  
+
   # Takes the path paramater and lists all classes found within that directory.
   #
   # Path can be either a package declaration, ie org.helvector.core.* or a file
   # path.
   #
   def self.list_package(path)
-    
+
     #if path is a package declaration convert it to a file path.
     path.gsub!('.','/') unless path =~ /\//
     path.sub!(/\/\*$/,'')
-    
+
     unless File.exist?(path)
       path = ENV['TM_PROJECT_DIRECTORY'] + "/src/" + path
     end
-    
+
     return nil unless File.exist?(path)
-    
+
     classes = []
-    
+
     Dir.foreach(path) do |f|
       classes << File.basename(f,$1) if f =~ /(\.(as|mxml))$/
     end
-    
+
     classes
-    
-  end	
-	  
-end
-
-module  TextMate
-  # Making source searching relative to the source paths
-  def TextMate.each_source_file (&block)
-    project_dir = ENV['TM_PROJECT_DIRECTORY']
-    return if project_dir.nil?
-
-    AS3Project.source_path_list.each do |sp|
-        fullpath = File.join(project_dir, sp)
-        TextMate.scan_dir(fullpath, block, ProjectFileFilter.new)
-    end
-	AS3Project.library_path_list.each do |sp|
-        fullpath = File.join(project_dir, sp)
-        TextMate.scan_dir(fullpath, block, ProjectFileFilter.new)
-    end
-	AS3Project.dump_path_list.each do |sp|
-        TextMate.scan_dir(sp, block, ProjectFileFilter.new)
-    end
 
   end
+
+  # Searches the current project for as and mxml files and returns them in an
+  # array. All collected file paths are truncated to their source directory.
+  #
+  def self.list_all_class_files
+
+    dirs = []
+    excludes = ['.svn', '.git']
+    types = /\.(as|mxml)/
+    classes = []
+
+    #limit the search to the common src dirs found within the proj root.
+    pr = ENV['TM_PROJECT_DIRECTORY']
+    common_src_dirs.each do |d|
+      dirs << "#{pr}/#{d}" if File.exist?("#{pr}/#{d}")
+    end
+    #if no src dirs are recognised scan the whole proj.
+    dirs << pr if dirs.empty?
+
+    for dir in dirs
+        Find.find(dir) do |path|
+
+            if FileTest.directory?(path)
+              if excludes.include?(File.basename(path))
+                  Find.prune
+              else
+                  next
+              end
+            elsif File.extname(path) =~ types
+              classes << truncate_to_src(path)
+            end
+        end
+    end
+
+    classes.uniq
+
+  end
+
+  def self.list_all_classes
+    cf = list_all_class_files
+    c = []
+    cf.each { |e| c << e.gsub('/','.').sub(/.(as|mxml)$/,'') }
+    c
+  end
+
 end
+
+# if __FILE__ == $0
+#
+# end

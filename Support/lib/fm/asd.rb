@@ -116,8 +116,14 @@ class LangReference
 
     if @found.size == 1
 
-      out << "<b>#{word}</b> Found, redirecting..."
-      out << "<meta http-equiv='refresh' content='0; tm-file://#{@found[0][:href]}'>"
+      fp = @found[0][:href]
+
+      if File.exist?(fp.sub(/#.*/,''))
+        out << "<b>#{word}</b> Found, redirecting..."
+        out << "<meta http-equiv='refresh' content='0; tm-file://#{fp}'>"
+      else
+        out << "<b>#{word}</b> was found in search index but the corresponding documentation file is missing."
+      end
 
     elsif @found.size > 0
 
@@ -125,7 +131,13 @@ class LangReference
       out << "<p><ul>"
 
       @found.each { |e|
-        out << "<li><a title='#{e[:title]}' href='tm-file://#{e[:href]}'>#{e[:class]}</a></li>"
+        doc_file = e[:href].sub(/#.+$/,'')
+        if File.exist?(doc_file)
+          out << "<li><a title='#{e[:title]}' href='tm-file://#{e[:href]}'>#{e[:class]}</a></li>\n"
+        else
+          out << "<li><span title='In search index but document is missing.'>#{e[:class]}</span></li>\n"
+        end
+
       }
 
       out << "</ul></p>"
@@ -168,6 +180,9 @@ class FlexLangReference < LangReference
     super
     @name     = 'Flex SDK'
     @path     = ENV['TM_FLEX_PATH'] + '/docs/langref'
+    #         This covers the odd case where the user has built the docs using the
+    #         tasks provided with the SDK.
+    @path     = ENV['TM_FLEX_PATH'] + '/asdoc-output' unless File.directory?(@path)
     @toc      = ENV['TM_BUNDLE_SUPPORT'] + '/data/doc_dictionary.xml'
     @lang_ref = "<a href='tm-file://#{@path}/index.html'" +
                 "title = '#{@name} - Flex Language Reference Index'>Flex&trade; Language Reference</a>"
