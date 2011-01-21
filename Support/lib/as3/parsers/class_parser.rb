@@ -502,6 +502,12 @@ class ClassParser
 		add_src_dir("#{cs}/frameworks/flash_ide")
 		add_src_dir("#{cs}/frameworks/flash_cs3")
 
+    # SWC definitions
+    AS3Project.dump_swcs
+    AS3Project.dump_path_list.each do |p|
+        add_src_dir(p);
+    end
+
 		# Where we have access to the compressed flex 3 files use them,
 		# otherwise go looking for the sdk.
 		unless add_src_dir("#{cs}/frameworks/flex_3")
@@ -563,17 +569,6 @@ class ClassParser
 			end
 
 		end
-
-    #Not found in source paths... looking inside SWCs
-    paths.each do |p|
-      if SourceTools.has_definition_in_swc? p
-          
-          # Wow, there really is a definition for this in a SWC
-          # time to get a class structure for this file
-          return strip_comments(SourceTools.skeleton_for_swc_class(p))
-          
-      end
-    end
 
 		as_file = File.basename(paths[0])
 
