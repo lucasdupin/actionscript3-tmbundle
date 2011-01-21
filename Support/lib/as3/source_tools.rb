@@ -260,6 +260,28 @@ module SourceTools
 
 end
 
+module  TextMate
+  # Making source searching relative to the source paths
+  def TextMate.each_source_file (&block)
+    project_dir = ENV['TM_PROJECT_DIRECTORY']
+    return if project_dir.nil?
+
+    AS3Project.source_path_list.each do |sp|
+        fullpath = File.join(project_dir, sp)
+        TextMate.scan_dir(fullpath, block, ProjectFileFilter.new)
+    end
+	AS3Project.library_path_list.each do |sp|
+        fullpath = File.join(project_dir, sp)
+        TextMate.scan_dir(fullpath, block, ProjectFileFilter.new)
+    end
+	AS3Project.dump_path_list.each do |sp|
+        TextMate.scan_dir(sp, block, ProjectFileFilter.new)
+    end
+
+  end
+end
+
+
 # if __FILE__ == $0
 #
 # end
