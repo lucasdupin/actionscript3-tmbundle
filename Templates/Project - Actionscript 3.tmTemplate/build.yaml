@@ -12,8 +12,8 @@ source-path:
     - source/classes
     
 applications:
-    - class: source/classes/${TM_NEW_FILE_BASENAME}.as
-      output: public/${TM_NEW_FILE_BASENAME}.swf      
+    - class: source/classes/Main.as
+      output: public/Main.swf      
       # exclude: source/classes/Other.as
 # asdoc:
 #     title: "My ActionScript project"
