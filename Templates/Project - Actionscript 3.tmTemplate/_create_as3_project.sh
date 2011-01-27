@@ -18,7 +18,7 @@ fullProjectPath=$(CocoaDialog filesave \
 if [ -n "$fullProjectPath" ]; then
 	
 	fullProjectPath=$(tail -n1 <<<"$fullProjectPath");
-	projectName=`basename "$fullProjectPath" ".tmproj"`;
+	projectName=`basename "$fullProjectPath" ".tmproj" | tr '[A-Z]' '[a-z]'`;
 	projectPath=`dirname "$fullProjectPath"`;
 	
 	# Now ask what the class path should be, used to create default dirs.
@@ -58,7 +58,7 @@ if [ -n "$fullProjectPath" ]; then
 		# files to match the project name.
 		perl -pe 's/\$\{([^}]*)\}/$ENV{$1}/g' < "build.yaml" > "$projectPath/$projectName/build.yaml";
 		perl -pe 's/\$\{([^}]*)\}/$ENV{$1}/g' < "../../Support/data/Rakefile" > "$projectPath/$projectName/Rakefile";
-		perl -pe 's/\$\{([^}]*)\}/$ENV{$1}/g' < "Project.as" > "$projectPath/$projectName/source/classes/$projectName.as";
+		perl -pe 's/\$\{([^}]*)\}/$ENV{$1}/g' < "Project.as" > "$projectPath/$projectName/source/classes/Main.as";
 		perl -pe 's/\$\{([^}]*)\}/$ENV{$1}/g' < "index.html" > "$projectPath/$projectName/public/index.html";
 		perl -pe 's/\$\{([^}]*)\}/$ENV{$1}/g' < "index.html" > "$projectPath/$projectName/public/index-debug.html";
 
