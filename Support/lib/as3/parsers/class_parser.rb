@@ -536,6 +536,10 @@ class ClassParser
 
       src_list = (ENV['TM_AS3_USUAL_SRC_DIRS'] != nil) ? ENV['TM_AS3_USUAL_SRC_DIRS'].gsub(':','|') : "src"
       @src_dirs = `find -dE "$TM_PROJECT_DIRECTORY" -maxdepth 5 -regex '.*\/(#{src_list})' -print 2>/dev/null`
+      
+      AS3Project.source_path_list.each do |p|
+        add_src_dir File.join(ENV['TM_PROJECT_DIRECTORY'], p)
+      end
 
     end
 
