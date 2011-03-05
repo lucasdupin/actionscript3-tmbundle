@@ -11,9 +11,6 @@ require ENV['TM_BUNDLE_SUPPORT'] + '/lib/fm/mxmlc_exhaust'
 
 module AS3Project     
   
-    #@logger = Logger.new('/tmp/fcshd/gui.log')
-    #@logger.level = Logger::DEBUG
-    
     @project = ENV['TM_PROJECT_DIRECTORY']
     @build_yaml = nil
     
@@ -239,7 +236,6 @@ module AS3Project
   	        list << File.join(lib_path, entry, "classes")
 	    end
 	  end
-      #@logger.debug("list: #{list}")
       list
   end
 
@@ -254,8 +250,6 @@ module AS3Project
 	    
 	    #Where to unpack
 	    lib_path = File.join(tmp_swc_dir, p.gsub("/","_"))
-	    
-      # @logger.debug("swc path: #{p} will be unpacked into: #{lib_path}")
 	    
 	    #Create a directory in the temp folder for holding the unpacked files
 	    FileUtils.mkdir_p lib_path unless File.directory? lib_path
