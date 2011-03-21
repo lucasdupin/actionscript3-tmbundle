@@ -49,7 +49,7 @@ if [ -n "$fullProjectPath" ]; then
 		mkdir -p "$classPathDirectory/views";
 		
 		# Gather variables to be substituted.
-		TM_NEW_FILE_BASENAME="$projectName";
+		export TM_NEW_FILE_BASENAME="$projectName";
 		
 		export TM_YEAR=`date "+%Y"`;
 		export TM_DATE=`date "+%d.%m.%Y"`;
